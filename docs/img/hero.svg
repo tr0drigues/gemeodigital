@@ -23,9 +23,9 @@
   <!-- texto -->
   <text x="64" y="92" fill="#e0b25c" font-size="15" font-weight="700" letter-spacing="4">GÊMEO DIGITAL</text>
   <text x="64" y="150" fill="#f5f3ff" font-size="50" font-weight="800" letter-spacing="-1">Citrix Rendezvous V2</text>
-  <text x="64" y="206" fill="#f5f3ff" font-size="50" font-weight="800" letter-spacing="-1">+ EDT, <tspan fill="#a78bfa">executável.</tspan></text>
-  <text x="64" y="256" fill="#a3a9c2" font-size="18">O que acontece com a sessão quando uma regra de firewall muda,</text>
-  <text x="64" y="282" fill="#a3a9c2" font-size="18">um componente cai ou a rede degrada — antes de acontecer.</text>
+  <text x="64" y="206" fill="#f5f3ff" font-size="50" font-weight="800" letter-spacing="-1">+ EDT</text>
+  <text x="64" y="256" fill="#a3a9c2" font-size="18">Modelo executável do caminho de rede. O que acontece com a sessão</text>
+  <text x="64" y="282" fill="#a3a9c2" font-size="18">quando uma regra de firewall muda, um componente cai ou a rede degrada.</text>
 
   <g font-size="14" font-weight="600">
     <rect x="64" y="322" width="166" height="38" rx="19" fill="#10b981" fill-opacity="0.14" stroke="#10b981" stroke-opacity="0.5"/>

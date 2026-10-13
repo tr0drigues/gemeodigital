@@ -1,0 +1,501 @@
+{
+  "schema": "gemeo-citrix/1.1",
+  "ambiente": "rendezvous-v2-continuidade",
+  "descricao": "Rendezvous V2 + EDT com continuidade de servico. Separa sessao nova de sessao em andamento: registro e autorizacao so valem para sessao nova; sessao ativa depende apenas do transporte.",
+  "premissas": [
+    "Maquinas AD domain joined: o Cloud Connector permanece no caminho de registro e autorizacao de sessao. Com maquinas Entra joined ou nao ingressadas no dominio, o Cloud Connector sai do modelo.",
+    "Acesso via StoreFront Cloud e Citrix Gateway Service.",
+    "Session Reliability habilitada no VDA, que e requisito do Rendezvous.",
+    "Autenticacao federada no IdP nao esta modelada: o fluxo de enumeracao representa autenticacao e enumeracao juntas.",
+    "Transporte HDX: o modelo exige o mesmo protocolo nas duas pernas (VDA-Gateway e cliente-Gateway). EDT numa perna e TCP na outra conta como sem caminho. Hipotese a validar em laboratorio."
+  ],
+  "perfis": [
+    {
+      "id": "sessao-nova",
+      "nome": "Sessão nova",
+      "detalhe": "usuário abrindo um recurso agora"
+    },
+    {
+      "id": "sessao-ativa",
+      "nome": "Sessão em andamento",
+      "detalhe": "usuário já conectado"
+    }
+  ],
+  "zonas": [
+    {
+      "id": "dc",
+      "nome": "Datacenter",
+      "detalhe": "rede onde fica o VDA",
+      "tipo": "proprio",
+      "cor": "amber"
+    },
+    {
+      "id": "cliente",
+      "nome": "Rede do cliente",
+      "detalhe": "fora do seu controle",
+      "tipo": "terceiro",
+      "cor": "blue"
+    },
+    {
+      "id": "citrix",
+      "nome": "Citrix Cloud",
+      "detalhe": "serviço do fornecedor",
+      "tipo": "fornecedor",
+      "cor": "violet"
+    }
+  ],
+  "nos": [
+    {
+      "id": "vda",
+      "nome": "VDA",
+      "detalhe": "datacenter",
+      "zona": "dc",
+      "disponibilidade": false
+    },
+    {
+      "id": "cc",
+      "nome": "Cloud Connector",
+      "detalhe": "registro e autorização",
+      "zona": "dc",
+      "disponibilidade": true
+    },
+    {
+      "id": "endpoint",
+      "nome": "Endpoint",
+      "detalhe": "Citrix Workspace App",
+      "zona": "cliente",
+      "disponibilidade": false
+    },
+    {
+      "id": "lease",
+      "nome": "Cache de lease",
+      "detalhe": "no dispositivo",
+      "zona": "cliente",
+      "disponibilidade": false
+    },
+    {
+      "id": "cloud",
+      "nome": "Citrix Cloud",
+      "detalhe": "*.xendesktop.net",
+      "zona": "citrix",
+      "disponibilidade": true
+    },
+    {
+      "id": "workspace",
+      "nome": "StoreFront Cloud",
+      "detalhe": "portal do usuário",
+      "zona": "citrix",
+      "disponibilidade": true
+    },
+    {
+      "id": "daas",
+      "nome": "DaaS",
+      "detalhe": "broker da sessão",
+      "zona": "citrix",
+      "disponibilidade": true
+    },
+    {
+      "id": "gw-ctrl",
+      "nome": "Gateway · controle",
+      "detalhe": "*.*.nssvc.net",
+      "zona": "citrix",
+      "disponibilidade": true
+    },
+    {
+      "id": "gw-hdx",
+      "nome": "Gateway · dados",
+      "detalhe": "*.*.nssvc.net",
+      "zona": "citrix",
+      "disponibilidade": true
+    }
+  ],
+  "estagios": [
+    {
+      "id": "registro",
+      "nome": "Registro do VDA",
+      "ordem": 1,
+      "exige": "todos",
+      "perfis": [
+        "sessao-nova"
+      ],
+      "ok": "o VDA está registrado e com canal de controle aberto",
+      "falha": "sem registro o VDA não é ofertado"
+    },
+    {
+      "id": "autorizacao",
+      "nome": "Autorização da sessão",
+      "ordem": 2,
+      "exige": "preferencial",
+      "perfis": [
+        "sessao-nova"
+      ],
+      "caminhos": {
+        "1": "portal e broker",
+        "2": "connection lease"
+      },
+      "ok": "a sessão é autorizada e recebe o ticket de lançamento",
+      "falha": "não há como autorizar o lançamento"
+    },
+    {
+      "id": "dados",
+      "nome": "Transporte HDX",
+      "ordem": 3,
+      "exige": "preferencial",
+      "perfis": [
+        "sessao-nova",
+        "sessao-ativa"
+      ],
+      "caminhos": {
+        "1": "EDT sobre UDP 443",
+        "2": "TCP 443"
+      },
+      "ok": "caminho de tela estabelecido",
+      "falha": "nenhum caminho chega ao dado HDX"
+    }
+  ],
+  "fluxos": [
+    {
+      "id": "reg-cloud",
+      "nome": "Registro no plano de controle",
+      "de": "vda",
+      "para": "cloud",
+      "proto": "TCP",
+      "porta": 443,
+      "destino": "*.xendesktop.net",
+      "zona": "dc",
+      "estagio": "registro",
+      "papel": "principal",
+      "preferencia": 1,
+      "padrao": true
+    },
+    {
+      "id": "reg-cc",
+      "nome": "Registro via Cloud Connector",
+      "de": "vda",
+      "para": "cc",
+      "proto": "TCP",
+      "porta": 443,
+      "destino": "cloud connector interno",
+      "zona": "dc",
+      "estagio": "registro",
+      "papel": "principal",
+      "preferencia": 1,
+      "padrao": true
+    },
+    {
+      "id": "ctl-gw",
+      "nome": "Canal de controle persistente",
+      "de": "vda",
+      "para": "gw-ctrl",
+      "proto": "TCP",
+      "porta": 443,
+      "destino": "*.*.nssvc.net",
+      "zona": "dc",
+      "estagio": "registro",
+      "papel": "principal",
+      "preferencia": 1,
+      "padrao": true
+    },
+    {
+      "id": "enum-ws",
+      "nome": "Autenticação e lista de recursos",
+      "de": "endpoint",
+      "para": "workspace",
+      "proto": "TCP",
+      "porta": 443,
+      "destino": "portal do usuário",
+      "zona": "cliente",
+      "estagio": "autorizacao",
+      "papel": "principal",
+      "preferencia": 1,
+      "padrao": true
+    },
+    {
+      "id": "broker-daas",
+      "nome": "Autorização e ticket de lançamento",
+      "de": "workspace",
+      "para": "daas",
+      "proto": "TCP",
+      "porta": 443,
+      "destino": "broker DaaS",
+      "zona": "citrix",
+      "estagio": "autorizacao",
+      "papel": "principal",
+      "preferencia": 1,
+      "padrao": true
+    },
+    {
+      "id": "cc-daas",
+      "nome": "Cloud Connector consulta o broker",
+      "de": "cc",
+      "para": "daas",
+      "proto": "TCP",
+      "porta": 443,
+      "destino": "broker DaaS",
+      "zona": "dc",
+      "estagio": "autorizacao",
+      "papel": "principal",
+      "preferencia": 1,
+      "padrao": true
+    },
+    {
+      "id": "lease-local",
+      "nome": "Connection lease em cache no dispositivo",
+      "de": "endpoint",
+      "para": "lease",
+      "proto": "LOCAL",
+      "porta": 0,
+      "destino": "arquivo no dispositivo",
+      "zona": "cliente",
+      "estagio": "autorizacao",
+      "papel": "alternativo",
+      "preferencia": 2,
+      "padrao": true
+    },
+    {
+      "id": "lease-gw",
+      "nome": "PoP valida o lease sem o plano de controle",
+      "de": "endpoint",
+      "para": "gw-hdx",
+      "proto": "TCP",
+      "porta": 443,
+      "destino": "*.*.nssvc.net",
+      "zona": "cliente",
+      "estagio": "autorizacao",
+      "papel": "alternativo",
+      "preferencia": 2,
+      "padrao": true
+    },
+    {
+      "id": "edt-dc",
+      "nome": "EDT saída do datacenter",
+      "de": "vda",
+      "para": "gw-hdx",
+      "proto": "UDP",
+      "porta": 443,
+      "destino": "*.*.nssvc.net",
+      "zona": "dc",
+      "estagio": "dados",
+      "papel": "principal",
+      "preferencia": 1,
+      "padrao": true
+    },
+    {
+      "id": "edt-cli",
+      "nome": "EDT saída do cliente",
+      "de": "endpoint",
+      "para": "gw-hdx",
+      "proto": "UDP",
+      "porta": 443,
+      "destino": "*.*.nssvc.net",
+      "zona": "cliente",
+      "estagio": "dados",
+      "papel": "principal",
+      "preferencia": 1,
+      "padrao": true
+    },
+    {
+      "id": "tcp-dc",
+      "nome": "Fallback TCP do datacenter",
+      "de": "vda",
+      "para": "gw-hdx",
+      "proto": "TCP",
+      "porta": 443,
+      "destino": "*.*.nssvc.net",
+      "zona": "dc",
+      "estagio": "dados",
+      "papel": "fallback",
+      "preferencia": 2,
+      "padrao": true
+    },
+    {
+      "id": "tcp-cli",
+      "nome": "Fallback TCP do cliente",
+      "de": "endpoint",
+      "para": "gw-hdx",
+      "proto": "TCP",
+      "porta": 443,
+      "destino": "*.*.nssvc.net",
+      "zona": "cliente",
+      "estagio": "dados",
+      "papel": "fallback",
+      "preferencia": 2,
+      "padrao": true
+    }
+  ],
+  "regras_sem_efeito": [
+    {
+      "id": "inbound",
+      "nome": "Qualquer porta inbound no VDA",
+      "detalhe": "teste: o modelo nao usa entrada",
+      "zona": "dc",
+      "veredito": "Nenhum estagio usa conexao de entrada no VDA. Todo o trafego parte de dentro para fora."
+    },
+    {
+      "id": "legacy",
+      "nome": "UDP 2598 / TCP 1494 no VDA",
+      "detalhe": "teste: portas do caminho antigo",
+      "zona": "dc",
+      "veredito": "Portas do caminho via Cloud Connector para o trafego HDX. Com Rendezvous V2 o dado vai todo em 443."
+    },
+    {
+      "id": "dns-gw",
+      "nome": "Entrada de DNS interno para o Gateway",
+      "detalhe": "teste: requisito que nao existe",
+      "zona": "dc",
+      "veredito": "O Rendezvous V2 nao tem requisito de DNS interno. A entrada nao muda nenhum estagio."
+    }
+  ],
+  "condicoes": [
+    {
+      "id": "inspecao-tls",
+      "nome": "Inspeção TLS na saída do datacenter",
+      "detalhe": "decriptação não é suportada",
+      "zona": "dc",
+      "bloqueia": [
+        "reg-cloud",
+        "ctl-gw",
+        "tcp-dc"
+      ],
+      "fonte": "Rendezvous V2 — proxy configuration: decriptação e inspeção não suportadas, a conexão falha sem exceção"
+    },
+    {
+      "id": "proxy-http-hdx",
+      "nome": "Proxy HTTP no caminho HDX",
+      "detalhe": "em vez de SOCKS5",
+      "zona": "dc",
+      "bloqueia": [
+        "edt-dc"
+      ],
+      "fonte": "Rendezvous V2 — só SOCKS5 transporta EDT; com proxy HTTP o ICA usa TCP"
+    },
+    {
+      "id": "cipher-suite",
+      "nome": "Ordem de cipher suites alterada no VDA",
+      "detalhe": "sem as suítes suportadas",
+      "zona": "dc",
+      "bloqueia": [
+        "reg-cloud",
+        "ctl-gw"
+      ],
+      "fonte": "Rendezvous V2 — sem as cipher suites suportadas a conexão Rendezvous falha"
+    },
+    {
+      "id": "session-reliability-off",
+      "nome": "Session Reliability desabilitada no VDA",
+      "detalhe": "requisito do Rendezvous",
+      "zona": "dc",
+      "bloqueia": [
+        "ctl-gw"
+      ],
+      "fonte": "Rendezvous V2 — requisitos: Session Reliability deve estar habilitada nos VDAs"
+    },
+    {
+      "id": "ip-fixo",
+      "nome": "Firewall libera por IP, e o IP mudou",
+      "detalhe": "regra por IP em vez de FQDN",
+      "zona": "dc",
+      "bloqueia": [
+        "ctl-gw",
+        "edt-dc",
+        "tcp-dc"
+      ],
+      "fonte": "os PoPs do Gateway Service entram e saem de rotação por DNS"
+    },
+    {
+      "id": "service-continuity-off",
+      "nome": "Service continuity desabilitada",
+      "detalhe": "sem connection lease",
+      "zona": "citrix",
+      "bloqueia": [
+        "lease-local",
+        "lease-gw"
+      ],
+      "fonte": "Service continuity — o lease é o que sustenta o lançamento durante indisponibilidade"
+    },
+    {
+      "id": "lease-expirado",
+      "nome": "Connection lease expirado",
+      "detalhe": "validade padrão de 7 dias",
+      "zona": "cliente",
+      "bloqueia": [
+        "lease-local"
+      ],
+      "fonte": "Service continuity — 7 dias por padrão, configurável até 30"
+    },
+    {
+      "id": "udp-timeout",
+      "nome": "Timeout de sessão UDP curto",
+      "detalhe": "firewall derruba fluxo ocioso",
+      "zona": "dc",
+      "degrada": [
+        "edt-dc"
+      ],
+      "efeito": "instavel",
+      "fonte": "comportamento de firewall, não da Citrix"
+    },
+    {
+      "id": "mtu",
+      "nome": "MTU reduzida / fragmentação bloqueada",
+      "detalhe": "no caminho até o Gateway",
+      "zona": "dc",
+      "degrada": [
+        "edt-dc"
+      ],
+      "efeito": "instavel",
+      "fonte": "comportamento de rede, não da Citrix"
+    },
+    {
+      "id": "zpa-sem-bypass",
+      "nome": "ZPA sem bypass para o Gateway Service",
+      "detalhe": "tráfego passa pelo ZPA",
+      "zona": "dc",
+      "degrada": [
+        "edt-dc",
+        "tcp-dc"
+      ],
+      "efeito": "instavel",
+      "fonte": "Rendezvous V2 — recomenda bypass do ZPA para os endereços do Gateway Service, senão há latência adicional"
+    },
+    {
+      "id": "latencia-alta",
+      "nome": "Latência alta até o Gateway Service",
+      "detalhe": "PoP distante do ponto de saída",
+      "zona": "dc",
+      "degrada": [
+        "edt-dc",
+        "tcp-dc",
+        "edt-cli",
+        "tcp-cli"
+      ],
+      "efeito": "instavel",
+      "fonte": "derivada da medicao: RTT acima do limiar definido em 'limiares'"
+    }
+  ],
+  "limiares": {
+    "rtt_ms": {
+      "aviso": 150,
+      "condicao": "latencia-alta",
+      "nota": "RTT de conexao acima do limiar liga a condicao de latencia. 150 ms e o ponto a partir do qual a perda de EDT passa a doer de verdade. So contam fluxos ate o Gateway Service: RTT do registro no Citrix Cloud nao e latencia de sessao.",
+      "fluxos": [
+        "ctl-gw",
+        "lease-gw",
+        "edt-dc",
+        "tcp-dc",
+        "edt-cli",
+        "tcp-cli"
+      ]
+    }
+  },
+  "degradacao_composta": {
+    "limite": 2,
+    "nota": "Dois ou mais fatores de degradacao sobre os fluxos em uso. O nivel continua 'deg', o titulo avisa. Na pratica, latencia alta com MTU ruim ou timeout UDP pode deixar a sessao inutilizavel sem cair. Limite a calibrar em laboratorio."
+  },
+  "aliases_observados": {
+    "_nota": "ids gravados pelo coletor -> ids deste modelo",
+    "tls": "inspecao-tls",
+    "proxy-tcp": "proxy-http-hdx",
+    "ctl": "ctl-gw",
+    "reg": "reg-cloud"
+  }
+}

@@ -1,0 +1,140 @@
+{
+  "schema": "gemeo-citrix-cenarios/1.0",
+  "ambiente": "rendezvous-v2-continuidade",
+  "cenarios": [
+    {
+      "id": "base",
+      "nome": "Conforme o modelo",
+      "detalhe": "tudo em pe, EDT ativo",
+      "aplica": {}
+    },
+    {
+      "id": "portal-fora",
+      "nome": "Portal do usuario fora do ar",
+      "detalhe": "o caso classico: quem ja esta conectado nao percebe",
+      "aplica": {
+        "nos": {
+          "workspace": false
+        }
+      }
+    },
+    {
+      "id": "broker-fora",
+      "nome": "Broker DaaS fora do ar",
+      "detalhe": "autorizacao cai, lease assume",
+      "aplica": {
+        "nos": {
+          "daas": false
+        }
+      }
+    },
+    {
+      "id": "portal-sem-continuidade",
+      "nome": "Portal fora e service continuity desligada",
+      "detalhe": "sem lease nao ha lancamento novo",
+      "aplica": {
+        "nos": {
+          "workspace": false
+        },
+        "condicoes": {
+          "service-continuity-off": true
+        }
+      }
+    },
+    {
+      "id": "lease-vencido",
+      "nome": "Portal fora e lease vencido",
+      "detalhe": "passou dos 7 dias sem sincronizar",
+      "aplica": {
+        "nos": {
+          "workspace": false
+        },
+        "condicoes": {
+          "lease-expirado": true
+        }
+      }
+    },
+    {
+      "id": "gw-dados-fora",
+      "nome": "Gateway de dados HDX fora do ar",
+      "detalhe": "unico evento que derruba os dois perfis",
+      "aplica": {
+        "nos": {
+          "gw-hdx": false
+        }
+      }
+    },
+    {
+      "id": "inspecao",
+      "nome": "Inspecao TLS ligada na saida",
+      "detalhe": "decriptacao nao e suportada no Rendezvous",
+      "aplica": {
+        "condicoes": {
+          "inspecao-tls": true
+        }
+      }
+    },
+    {
+      "id": "proxy-http",
+      "nome": "Proxy HTTP no caminho HDX",
+      "detalhe": "EDT exige SOCKS5; com HTTP o ICA cai para TCP",
+      "aplica": {
+        "condicoes": {
+          "proxy-http-hdx": true
+        }
+      }
+    },
+    {
+      "id": "cipher",
+      "nome": "Ordem de cipher suites alterada no VDA",
+      "detalhe": "hardening que faz o Rendezvous falhar",
+      "aplica": {
+        "condicoes": {
+          "cipher-suite": true
+        }
+      }
+    },
+    {
+      "id": "sr-off",
+      "nome": "Session Reliability desabilitada",
+      "detalhe": "requisito do Rendezvous que costuma passar batido",
+      "aplica": {
+        "condicoes": {
+          "session-reliability-off": true
+        }
+      }
+    },
+    {
+      "id": "udp-dc",
+      "nome": "Seguranca bloqueia UDP de saida",
+      "detalhe": "decisao tomada no datacenter",
+      "aplica": {
+        "fluxos": {
+          "edt-dc": false
+        }
+      }
+    },
+    {
+      "id": "zpa",
+      "nome": "ZPA sem bypass para o Gateway Service",
+      "detalhe": "latencia extra nos dois caminhos de dados",
+      "aplica": {
+        "condicoes": {
+          "zpa-sem-bypass": true
+        }
+      }
+    },
+    {
+      "id": "sem-efeito",
+      "nome": "Regras que nao fazem nada",
+      "detalhe": "inbound, 2598/1494 e DNS interno",
+      "aplica": {
+        "sem_efeito": {
+          "inbound": true,
+          "legacy": true,
+          "dns-gw": true
+        }
+      }
+    }
+  ]
+}

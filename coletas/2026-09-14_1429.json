@@ -1,0 +1,145 @@
+{
+  "schema": "gemeo-citrix-observado/1.2",
+  "origens": [
+    "coletor-citrix.py / vda-01 / linux",
+    "coletor-citrix.py / estacao-cliente-01-01 / darwin"
+  ],
+  "alvos": {
+    "ctl-gw": "global.g.nssvc.net",
+    "reg-cloud": "<customer-id>.xendesktop.net",
+    "tcp-cli": "global.g.nssvc.net"
+  },
+  "dns": {
+    "ctl-gw": {
+      "ok": true,
+      "ips": [
+        "191.233.241.126"
+      ],
+      "rotacionou": false,
+      "fqdn": "global.g.nssvc.net"
+    },
+    "reg-cloud": {
+      "ok": true,
+      "ips": [
+        "52.224.190.139"
+      ],
+      "rotacionou": false,
+      "fqdn": "<customer-id>.xendesktop.net"
+    },
+    "tcp-cli": {
+      "ok": true,
+      "ips": [
+        "191.233.241.126"
+      ],
+      "rotacionou": false,
+      "fqdn": "global.g.nssvc.net"
+    }
+  },
+  "tls": {
+    "ctl-gw": {
+      "ok": true,
+      "validou": true,
+      "emissor": "DigiCert Inc",
+      "emissor_cn": "DigiCert Global G2 TLS RSA SHA256 2020 CA1",
+      "expira": "Mar 26 23:59:59 2027 GMT",
+      "protocolo": "TLSv1.2",
+      "inspecao": false
+    },
+    "reg-cloud": {
+      "ok": true,
+      "validou": true,
+      "emissor": "DigiCert Inc",
+      "emissor_cn": "DigiCert Global G2 TLS RSA SHA256 2020 CA1",
+      "expira": "Mar  7 23:59:59 2027 GMT",
+      "protocolo": "TLSv1.2",
+      "inspecao": false
+    },
+    "tcp-cli": {
+      "ok": true,
+      "validou": true,
+      "emissor": "DigiCert Inc",
+      "emissor_cn": "DigiCert Global G2 TLS RSA SHA256 2020 CA1",
+      "expira": "Mar 26 23:59:59 2027 GMT",
+      "protocolo": "TLSv1.2",
+      "inspecao": false
+    }
+  },
+  "fluxos": {
+    "ctl-gw": {
+      "estado": "ok",
+      "rtt_ms": 244,
+      "testado": true,
+      "ponto": "vda-01",
+      "origem": "coletor-citrix.py / vda-01 / linux",
+      "ip": "40.76.167.50"
+    },
+    "reg-cloud": {
+      "estado": "ok",
+      "rtt_ms": 242,
+      "testado": true,
+      "ponto": "vda-01",
+      "origem": "coletor-citrix.py / vda-01 / linux",
+      "ip": "52.224.190.139"
+    },
+    "tcp-cli": {
+      "estado": "ok",
+      "rtt_ms": 14,
+      "testado": true,
+      "ponto": "estacao-cliente-01-01",
+      "origem": "coletor-citrix.py / estacao-cliente-01-01 / darwin",
+      "ip": "191.233.241.126"
+    }
+  },
+  "medicoes": {
+    "ctl-gw": [
+      {
+        "estado": "ok",
+        "rtt_ms": 244,
+        "testado": true,
+        "ponto": "vda-01",
+        "origem": "coletor-citrix.py / vda-01 / linux",
+        "ip": "40.76.167.50"
+      },
+      {
+        "estado": "ok",
+        "rtt_ms": 20,
+        "testado": true,
+        "ponto": "estacao-cliente-01-01",
+        "origem": "coletor-citrix.py / estacao-cliente-01-01 / darwin",
+        "ip": "191.233.241.126"
+      }
+    ],
+    "reg-cloud": [
+      {
+        "estado": "ok",
+        "rtt_ms": 242,
+        "testado": true,
+        "ponto": "vda-01",
+        "origem": "coletor-citrix.py / vda-01 / linux",
+        "ip": "52.224.190.139"
+      }
+    ],
+    "tcp-cli": [
+      {
+        "estado": "ok",
+        "rtt_ms": 14,
+        "testado": true,
+        "ponto": "estacao-cliente-01-01",
+        "origem": "coletor-citrix.py / estacao-cliente-01-01 / darwin",
+        "ip": "191.233.241.126"
+      }
+    ]
+  },
+  "condicoes": {
+    "tls": false,
+    "ip-fixo": false,
+    "proxy-tcp": false
+  },
+  "sessoes": null,
+  "coletado_em": "2026-09-14T14:29:43.502841+00:00",
+  "origem": "coletor-citrix.py / vda-01 / linux + coletor-citrix.py / estacao-cliente-01-01 / darwin",
+  "janela": {
+    "primeira": "2026-09-14T14:28:38.587923+00:00",
+    "ultima": "2026-09-14T14:29:43.502841+00:00"
+  }
+}

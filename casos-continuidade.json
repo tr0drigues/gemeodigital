@@ -1,0 +1,221 @@
+{
+  "suite": "rendezvous-v2-continuidade",
+  "ambiente": "ambiente-continuidade.json",
+  "nota": "Casos esperados do modelo. Quando o laboratorio contradisser um caso, corrija o modelo e o caso junto, para nao regredir.",
+  "casos": [
+    { "nome": "baseline: tudo em pe, EDT ativo",
+      "aplica": {},
+      "espera": {
+        "Sessão nova":        { "nivel": "ok", "estagios": { "registro": "ok", "autorizacao": "principal", "dados": "principal" } },
+        "Sessão em andamento":{ "nivel": "ok", "estagios": { "dados": "principal" } } } },
+
+    { "nome": "portal do usuario fora: lease assume, sessao ativa intacta",
+      "aplica": { "nos": { "workspace": false } },
+      "espera": {
+        "Sessão nova":        { "nivel": "deg", "estagios": { "registro": "ok", "autorizacao": "alternativo", "dados": "principal" } },
+        "Sessão em andamento":{ "nivel": "ok",  "estagios": { "dados": "principal" } } } },
+
+    { "nome": "broker DaaS fora: mesmo desfecho do portal",
+      "aplica": { "nos": { "daas": false } },
+      "espera": {
+        "Sessão nova":        { "nivel": "deg", "estagios": { "autorizacao": "alternativo" } },
+        "Sessão em andamento":{ "nivel": "ok" } } },
+
+    { "nome": "portal fora sem service continuity: nao ha lancamento novo",
+      "aplica": { "nos": { "workspace": false }, "condicoes": { "service-continuity-off": true } },
+      "espera": {
+        "Sessão nova":        { "nivel": "fail", "estagios": { "autorizacao": "falha", "dados": "nao-avaliado" } },
+        "Sessão em andamento":{ "nivel": "ok" } } },
+
+    { "nome": "portal fora com lease vencido: mesmo desfecho",
+      "aplica": { "nos": { "workspace": false }, "condicoes": { "lease-expirado": true } },
+      "espera": {
+        "Sessão nova":        { "nivel": "fail", "estagios": { "autorizacao": "falha" } },
+        "Sessão em andamento":{ "nivel": "ok" } } },
+
+    { "nome": "service continuity desligada sozinha nao tem efeito",
+      "aplica": { "condicoes": { "service-continuity-off": true } },
+      "espera": {
+        "Sessão nova":        { "nivel": "ok" },
+        "Sessão em andamento":{ "nivel": "ok" } } },
+
+    { "nome": "gateway de dados fora: derruba os dois perfis",
+      "aplica": { "nos": { "gw-hdx": false } },
+      "espera": {
+        "Sessão nova":        { "nivel": "fail", "estagios": { "dados": "falha" } },
+        "Sessão em andamento":{ "nivel": "fail", "estagios": { "dados": "falha" } } } },
+
+    { "nome": "UDP bloqueado no datacenter: cai para TCP nos dois perfis",
+      "aplica": { "fluxos": { "edt-dc": false } },
+      "espera": {
+        "Sessão nova":        { "nivel": "deg", "estagios": { "dados": "alternativo" } },
+        "Sessão em andamento":{ "nivel": "deg", "estagios": { "dados": "alternativo" } } } },
+
+    { "nome": "proxy HTTP no caminho HDX: EDT indisponivel, sessao segue em TCP",
+      "aplica": { "condicoes": { "proxy-http-hdx": true } },
+      "espera": {
+        "Sessão nova":        { "nivel": "deg", "estagios": { "dados": "alternativo" } },
+        "Sessão em andamento":{ "nivel": "deg", "estagios": { "dados": "alternativo" } } } },
+
+    { "nome": "cipher suites alteradas: derruba sessao nova, ativa segue",
+      "aplica": { "condicoes": { "cipher-suite": true } },
+      "espera": {
+        "Sessão nova":        { "nivel": "fail", "estagios": { "registro": "falha" } },
+        "Sessão em andamento":{ "nivel": "ok" } } },
+
+    { "nome": "session reliability desabilitada: requisito do Rendezvous",
+      "aplica": { "condicoes": { "session-reliability-off": true } },
+      "espera": {
+        "Sessão nova":        { "nivel": "fail", "estagios": { "registro": "falha" } },
+        "Sessão em andamento":{ "nivel": "ok" } } },
+
+    { "nome": "inspecao TLS com proxy HTTP: derruba os dois perfis",
+      "aplica": { "condicoes": { "inspecao-tls": true, "proxy-http-hdx": true } },
+      "espera": {
+        "Sessão nova":        { "nivel": "fail", "estagios": { "registro": "falha" } },
+        "Sessão em andamento":{ "nivel": "fail", "estagios": { "dados": "falha" } } } },
+
+    { "nome": "ZPA sem bypass: degrada os dois caminhos de dados",
+      "aplica": { "condicoes": { "zpa-sem-bypass": true } },
+      "espera": {
+        "Sessão nova":        { "nivel": "deg", "estagios": { "dados": "principal-degradado" } },
+        "Sessão em andamento":{ "nivel": "deg", "estagios": { "dados": "principal-degradado" } } } },
+
+    { "nome": "fallback TCP ausente nao muda nada enquanto o EDT esta de pe",
+      "aplica": { "fluxos": { "tcp-dc": false, "tcp-cli": false } },
+      "espera": {
+        "Sessão nova":        { "nivel": "ok", "estagios": { "dados": "principal" } },
+        "Sessão em andamento":{ "nivel": "ok" } } },
+    { "nome": "regra por IP e o PoP mudou: o outro evento unico que derruba os dois perfis",
+      "aplica": { "condicoes": { "ip-fixo": true } },
+      "espera": {
+        "Sessão nova":        { "nivel": "fail", "estagios": { "registro": "falha" } },
+        "Sessão em andamento":{ "nivel": "fail", "estagios": { "dados": "falha" } } } },
+
+    { "nome": "emergente: portal fora com lease vencido derruba sessao nova (rede de seguranca desarmada)",
+      "aplica": { "fluxos": { "enum-ws": false }, "condicoes": { "lease-expirado": true } },
+      "espera": {
+        "Sessão nova":        { "nivel": "fail", "estagios": { "registro": "ok", "autorizacao": "falha", "dados": "nao-avaliado" } },
+        "Sessão em andamento":{ "nivel": "ok" } } },
+
+    { "nome": "emergente: broker DaaS fora sem service continuity derruba sessao nova",
+      "aplica": { "fluxos": { "broker-daas": false }, "condicoes": { "service-continuity-off": true } },
+      "espera": {
+        "Sessão nova":        { "nivel": "fail", "estagios": { "autorizacao": "falha" } },
+        "Sessão em andamento":{ "nivel": "ok" } } },
+
+    { "nome": "emergente: DaaS fora sem lease em cache derruba sessao nova",
+      "aplica": { "nos": { "daas": false }, "fluxos": { "lease-local": false } },
+      "espera": {
+        "Sessão nova":        { "nivel": "fail", "estagios": { "autorizacao": "falha" } },
+        "Sessão em andamento":{ "nivel": "ok" } } },
+
+    { "nome": "emergente: UDP fechado no cliente e TCP fechado no datacenter derrubam os dois perfis",
+      "aplica": { "fluxos": { "edt-cli": false, "tcp-dc": false } },
+      "espera": {
+        "Sessão nova":        { "nivel": "fail", "estagios": { "autorizacao": "principal", "dados": "falha" } },
+        "Sessão em andamento":{ "nivel": "fail", "estagios": { "dados": "falha" } } } },
+
+    { "nome": "emergente: proxy HTTP no DC com TCP fechado no cliente derruba os dois perfis",
+      "aplica": { "condicoes": { "proxy-http-hdx": true }, "fluxos": { "tcp-cli": false } },
+      "espera": {
+        "Sessão nova":        { "nivel": "fail", "estagios": { "dados": "falha" } },
+        "Sessão em andamento":{ "nivel": "fail", "estagios": { "dados": "falha" } } } },
+
+    { "nome": "UDP fechado nas duas pontas: cai para TCP, nao derruba",
+      "aplica": { "fluxos": { "edt-dc": false, "edt-cli": false } },
+      "espera": {
+        "Sessão nova":        { "nivel": "deg", "estagios": { "dados": "alternativo" } },
+        "Sessão em andamento":{ "nivel": "deg", "estagios": { "dados": "alternativo" } } } },
+
+    { "nome": "um fator de degradacao sozinho nao e composto",
+      "aplica": { "condicoes": { "latencia-alta": true } },
+      "espera": {
+        "Sessão em andamento":{ "nivel": "deg", "composta": false } } },
+
+    { "nome": "latencia alta com MTU ruim: segue deg, mas sinalizado como degradacao composta",
+      "aplica": { "condicoes": { "latencia-alta": true, "mtu": true } },
+      "espera": {
+        "Sessão nova":        { "nivel": "deg", "composta": true },
+        "Sessão em andamento":{ "nivel": "deg", "composta": true } } },
+
+    { "nome": "coleta: inspecao TLS gravada como 'tls' pelo coletor chega ao modelo",
+      "observado": { "fluxos": {}, "condicoes": { "tls": true } },
+      "espera": {
+        "Sessão nova":        { "nivel": "fail", "estagios": { "registro": "falha" } } } },
+
+    { "nome": "coleta: RTT alto no registro do Cloud nao vira latencia ate o Gateway",
+      "observado": { "fluxos": { "reg": { "estado": "ok", "rtt_ms": 400 }, "ctl": { "estado": "ok", "rtt_ms": 20 } } },
+      "espera": {
+        "Sessão nova":        { "nivel": "ok" },
+        "Sessão em andamento":{ "nivel": "ok" } } },
+
+    { "nome": "coleta: RTT alto no controle do Gateway liga latencia alta",
+      "observado": { "fluxos": { "ctl": { "estado": "ok", "rtt_ms": 220 } } },
+      "espera": {
+        "Sessão em andamento":{ "nivel": "deg", "estagios": { "dados": "principal-degradado" } } } },
+
+    { "nome": "coleta: controle do Gateway bloqueado (id 'ctl') chega ao modelo como ctl-gw",
+      "observado": { "fluxos": { "ctl": { "estado": "bloqueado" } } },
+      "espera": {
+        "Sessão nova":        { "nivel": "fail", "estagios": { "registro": "falha" } },
+        "Sessão em andamento":{ "nivel": "ok" } } },
+    { "nome": "hipotese: SD-WAN que nao encaminha UDP no DC tira o EDT, sessao segue em TCP",
+      "extensao": { "condicoes": [ { "id": "hip-sdwan-sem-udp", "nome": "SD-WAN sem UDP 443", "zona": "dc",
+        "bloqueia": ["edt-dc"], "justificativa": "UDP 443 nao e encaminhado na saida do DC", "confianca": "media" } ] },
+      "espera": {
+        "Sessão nova":        { "nivel": "deg", "estagios": { "dados": "alternativo" } },
+        "Sessão em andamento":{ "nivel": "deg", "estagios": { "dados": "alternativo" } } } },
+
+    { "nome": "hipotese: o motor encadeia a hipotese com o que ja existe (SD-WAN sem UDP + inspecao TLS derruba sessao ativa)",
+      "extensao": { "condicoes": [ { "id": "hip-sdwan-sem-udp", "nome": "SD-WAN sem UDP 443", "zona": "dc",
+        "bloqueia": ["edt-dc"], "justificativa": "UDP 443 nao e encaminhado na saida do DC", "confianca": "media" } ] },
+      "aplica": { "condicoes": { "inspecao-tls": true } },
+      "espera": {
+        "Sessão em andamento":{ "nivel": "fail", "estagios": { "dados": "falha" } } } },
+
+    { "nome": "hipotese: degradacao declarada soma com latencia e vira composta",
+      "extensao": { "condicoes": [ { "id": "hip-qos-baixa", "nome": "QoS rebaixa a 443", "zona": "dc",
+        "degrada": ["edt-dc"], "justificativa": "politica de QoS joga a 443 na fila de menor prioridade", "confianca": "baixa" } ] },
+      "aplica": { "condicoes": { "latencia-alta": true } },
+      "espera": {
+        "Sessão em andamento":{ "nivel": "deg", "composta": true, "estagios": { "dados": "principal-degradado" } } } },
+
+    { "nome": "hipotese invalida: fluxo inexistente e descartada, modelo fica intacto",
+      "extensao": { "condicoes": [ { "id": "hip-mfa", "nome": "MFA novo", "zona": "cliente",
+        "bloqueia": ["auth-idp", "edt-dc", "tcp-dc"], "justificativa": "MFA no IdP", "confianca": "alta" } ] },
+      "descartadas": ["hip-mfa"],
+      "espera": {
+        "Sessão nova":        { "nivel": "ok" },
+        "Sessão em andamento":{ "nivel": "ok" } } },
+
+    { "nome": "hipotese invalida: id sem prefixo hip- nao pode sobrescrever condicao revisada",
+      "extensao": { "condicoes": [ { "id": "mtu", "nome": "MTU redefinida", "zona": "dc",
+        "bloqueia": ["edt-dc", "tcp-dc"], "justificativa": "tentativa de redefinir", "confianca": "alta" } ] },
+      "espera": {
+        "Sessão nova":        { "nivel": "ok" },
+        "Sessão em andamento":{ "nivel": "ok" } } },
+    { "nome": "hipotese com o nome da zona em vez do id e aceita (firewall novo na rede do cliente)",
+      "extensao": { "condicoes": [ { "id": "hip-firewall-cliente", "nome": "Firewall novo na rede do cliente", "zona": "Rede do cliente",
+        "bloqueia": ["edt-cli"], "justificativa": "firewall novo sem regra para UDP 443 de saida", "confianca": "media" } ] },
+      "espera": {
+        "Sessão em andamento":{ "nivel": "deg", "estagios": { "dados": "alternativo" } } } },
+
+    {"nome": "hipotese componente: proxy SOCKS5 inline no DC, de pe, nao muda nada", "extensao": {"nos": [{"id": "hip-proxy-socks", "nome": "Proxy SOCKS5", "zona": "dc", "justificativa": "proxy de saída novo no DC", "confianca": "media"}], "fluxos": [{"id": "hip-vda-proxy-udp", "nome": "EDT do VDA até o proxy", "de": "vda", "para": "hip-proxy-socks", "proto": "UDP", "porta": 1080, "destino": "proxy SOCKS5", "zona": "dc", "estagio": "dados", "papel": "principal", "preferencia": 1, "justificativa": "o EDT passa pelo proxy", "confianca": "media"}, {"id": "hip-vda-proxy-tcp", "nome": "TCP do VDA até o proxy", "de": "vda", "para": "hip-proxy-socks", "proto": "TCP", "porta": 1080, "destino": "proxy SOCKS5", "zona": "dc", "estagio": "dados", "papel": "fallback", "preferencia": 2, "justificativa": "o fallback TCP passa pelo proxy", "confianca": "media"}]}, "espera": {"Sessão nova": {"nivel": "ok", "estagios": {"dados": "principal"}}, "Sessão em andamento": {"nivel": "ok", "estagios": {"dados": "principal"}}}, "descartadas": [], "varredura_inclui": ["n:hip-proxy-socks", "f:hip-vda-proxy-udp", "f:hip-vda-proxy-tcp"]},
+    {"nome": "hipotese componente: proxy SOCKS5 inline fora vira ponto unico de falha e derruba os dois perfis", "extensao": {"nos": [{"id": "hip-proxy-socks", "nome": "Proxy SOCKS5", "zona": "dc", "justificativa": "proxy de saída novo no DC", "confianca": "media"}], "fluxos": [{"id": "hip-vda-proxy-udp", "nome": "EDT do VDA até o proxy", "de": "vda", "para": "hip-proxy-socks", "proto": "UDP", "porta": 1080, "destino": "proxy SOCKS5", "zona": "dc", "estagio": "dados", "papel": "principal", "preferencia": 1, "justificativa": "o EDT passa pelo proxy", "confianca": "media"}, {"id": "hip-vda-proxy-tcp", "nome": "TCP do VDA até o proxy", "de": "vda", "para": "hip-proxy-socks", "proto": "TCP", "porta": 1080, "destino": "proxy SOCKS5", "zona": "dc", "estagio": "dados", "papel": "fallback", "preferencia": 2, "justificativa": "o fallback TCP passa pelo proxy", "confianca": "media"}]}, "aplica": {"nos": {"hip-proxy-socks": false}}, "espera": {"Sessão nova": {"nivel": "fail", "estagios": {"dados": "falha"}}, "Sessão em andamento": {"nivel": "fail", "estagios": {"dados": "falha"}}}},
+    {"nome": "hipotese fluxo: so o UDP ate o proxy bloqueado cai para TCP pelo proxy", "extensao": {"nos": [{"id": "hip-proxy-socks", "nome": "Proxy SOCKS5", "zona": "dc", "justificativa": "proxy de saída novo no DC", "confianca": "media"}], "fluxos": [{"id": "hip-vda-proxy-udp", "nome": "EDT do VDA até o proxy", "de": "vda", "para": "hip-proxy-socks", "proto": "UDP", "porta": 1080, "destino": "proxy SOCKS5", "zona": "dc", "estagio": "dados", "papel": "principal", "preferencia": 1, "justificativa": "o EDT passa pelo proxy", "confianca": "media"}, {"id": "hip-vda-proxy-tcp", "nome": "TCP do VDA até o proxy", "de": "vda", "para": "hip-proxy-socks", "proto": "TCP", "porta": 1080, "destino": "proxy SOCKS5", "zona": "dc", "estagio": "dados", "papel": "fallback", "preferencia": 2, "justificativa": "o fallback TCP passa pelo proxy", "confianca": "media"}]}, "aplica": {"fluxos": {"hip-vda-proxy-udp": false}}, "espera": {"Sessão em andamento": {"nivel": "deg", "estagios": {"dados": "alternativo"}}}},
+    {"nome": "hipotese condicao sobre fluxo hipotetico: firewall do proxy sem UDP", "extensao": {"nos": [{"id": "hip-proxy-socks", "nome": "Proxy SOCKS5", "zona": "dc", "justificativa": "proxy de saída novo no DC", "confianca": "media"}], "fluxos": [{"id": "hip-vda-proxy-udp", "nome": "EDT do VDA até o proxy", "de": "vda", "para": "hip-proxy-socks", "proto": "UDP", "porta": 1080, "destino": "proxy SOCKS5", "zona": "dc", "estagio": "dados", "papel": "principal", "preferencia": 1, "justificativa": "o EDT passa pelo proxy", "confianca": "media"}, {"id": "hip-vda-proxy-tcp", "nome": "TCP do VDA até o proxy", "de": "vda", "para": "hip-proxy-socks", "proto": "TCP", "porta": 1080, "destino": "proxy SOCKS5", "zona": "dc", "estagio": "dados", "papel": "fallback", "preferencia": 2, "justificativa": "o fallback TCP passa pelo proxy", "confianca": "media"}], "condicoes": [{"id": "hip-proxy-sem-udp", "nome": "Proxy não repassa UDP", "zona": "dc", "bloqueia": ["hip-vda-proxy-udp"], "justificativa": "SOCKS5 sem UDP ASSOCIATE", "confianca": "media"}]}, "espera": {"Sessão nova": {"nivel": "deg", "estagios": {"dados": "alternativo"}}, "Sessão em andamento": {"nivel": "deg", "estagios": {"dados": "alternativo"}}}, "descartadas": []},
+    {"nome": "hipotese em estagio 'todos': proxy no controle fora derruba so a sessao nova", "extensao": {"nos": [{"id": "hip-proxy-http", "nome": "Proxy HTTP de saída", "zona": "dc", "justificativa": "proxy explícito no caminho de controle", "confianca": "media"}], "fluxos": [{"id": "hip-vda-proxy-ctl", "nome": "Controle do VDA via proxy", "de": "vda", "para": "hip-proxy-http", "proto": "TCP", "porta": 8080, "destino": "proxy HTTP", "zona": "dc", "estagio": "registro", "papel": "principal", "justificativa": "o canal de controle sai pelo proxy", "confianca": "media"}]}, "aplica": {"nos": {"hip-proxy-http": false}}, "espera": {"Sessão nova": {"nivel": "fail", "estagios": {"registro": "falha"}}, "Sessão em andamento": {"nivel": "ok"}}},
+    {"nome": "hipotese caminho novo: HDX via VPN segura a sessao com o Gateway de dados fora", "extensao": {"fluxos": [{"id": "hip-hdx-vpn", "nome": "HDX direto via VPN", "de": "endpoint", "para": "vda", "proto": "TCP", "porta": 1494, "destino": "VDA pela VPN", "zona": "cliente", "estagio": "dados", "papel": "alternativo", "preferencia": 3, "caminho": "HDX direto via VPN", "justificativa": "VPN do cliente alcança o VDA sem passar pelo Gateway", "confianca": "baixa"}]}, "aplica": {"nos": {"gw-hdx": false}}, "espera": {"Sessão nova": {"nivel": "deg", "estagios": {"dados": "alternativo"}}, "Sessão em andamento": {"nivel": "deg", "estagios": {"dados": "alternativo"}}}, "descartadas": []},
+    {"nome": "hipotese caminho novo nao interfere enquanto os caminhos melhores estao de pe", "extensao": {"fluxos": [{"id": "hip-hdx-vpn", "nome": "HDX direto via VPN", "de": "endpoint", "para": "vda", "proto": "TCP", "porta": 1494, "destino": "VDA pela VPN", "zona": "cliente", "estagio": "dados", "papel": "alternativo", "preferencia": 3, "caminho": "HDX direto via VPN", "justificativa": "VPN do cliente alcança o VDA sem passar pelo Gateway", "confianca": "baixa"}]}, "espera": {"Sessão nova": {"nivel": "ok", "estagios": {"dados": "principal"}}, "Sessão em andamento": {"nivel": "ok"}}},
+    {"nome": "hipotese referenciando no e estagio pelo nome e aceita", "extensao": {"fluxos": [{"id": "hip-hdx-vpn", "nome": "HDX direto via VPN", "de": "Endpoint", "para": "VDA", "proto": "tcp", "porta": 1494, "zona": "Rede do cliente", "estagio": "Transporte HDX", "papel": "alternativo", "preferencia": 3, "justificativa": "VPN", "confianca": "baixa"}]}, "aplica": {"nos": {"gw-hdx": false}}, "espera": {"Sessão em andamento": {"nivel": "deg", "estagios": {"dados": "alternativo"}}}, "descartadas": []},
+    {"nome": "hipotese invalida: componente sem fluxo e descartado", "extensao": {"nos": [{"id": "hip-appliance", "nome": "Appliance", "zona": "dc", "justificativa": "appliance novo", "confianca": "baixa"}]}, "espera": {"Sessão nova": {"nivel": "ok"}, "Sessão em andamento": {"nivel": "ok"}}, "descartadas": ["hip-appliance"]},
+    {"nome": "hipotese invalida: estagio novo (MFA) nao vira fluxo; o componente fica sem fluxo e cai junto", "extensao": {"nos": [{"id": "hip-idp", "nome": "IdP com MFA", "zona": "citrix", "justificativa": "MFA novo", "confianca": "media"}], "fluxos": [{"id": "hip-mfa", "nome": "MFA", "de": "endpoint", "para": "hip-idp", "proto": "TCP", "porta": 443, "zona": "cliente", "estagio": "autenticacao", "papel": "principal", "justificativa": "MFA", "confianca": "media"}]}, "espera": {"Sessão nova": {"nivel": "ok"}, "Sessão em andamento": {"nivel": "ok"}}, "descartadas": ["hip-mfa", "hip-idp"]},
+    {"nome": "hipotese invalida: fluxo apontando para componente descartado e descartado tambem", "extensao": {"nos": [{"id": "hip-x", "nome": "X", "zona": "zona-que-nao-existe", "justificativa": "x", "confianca": "baixa"}], "fluxos": [{"id": "hip-vda-x", "nome": "VDA até X", "de": "vda", "para": "hip-x", "proto": "TCP", "porta": 443, "zona": "dc", "estagio": "dados", "papel": "principal", "preferencia": 1, "justificativa": "x", "confianca": "baixa"}]}, "espera": {"Sessão nova": {"nivel": "ok"}, "Sessão em andamento": {"nivel": "ok"}}, "descartadas": ["hip-x", "hip-vda-x"]},
+    {"nome": "hipotese invalida: fluxo nao pode reusar id existente nem ter porta, protocolo ou preferencia invalidos", "extensao": {"fluxos": [{"id": "edt-dc", "nome": "sobrescrita", "de": "vda", "para": "gw-hdx", "proto": "UDP", "porta": 443, "zona": "dc", "estagio": "dados", "preferencia": 1, "justificativa": "x", "confianca": "baixa"}, {"id": "hip-porta", "nome": "porta", "de": "vda", "para": "gw-hdx", "proto": "TCP", "porta": 70000, "zona": "dc", "estagio": "dados", "preferencia": 1, "justificativa": "x", "confianca": "baixa"}, {"id": "hip-proto", "nome": "proto", "de": "vda", "para": "gw-hdx", "proto": "ICMP", "porta": 1, "zona": "dc", "estagio": "dados", "preferencia": 1, "justificativa": "x", "confianca": "baixa"}, {"id": "hip-pref", "nome": "pref", "de": "vda", "para": "gw-hdx", "proto": "TCP", "porta": 443, "zona": "dc", "estagio": "dados", "preferencia": 0, "justificativa": "x", "confianca": "baixa"}, {"id": "hip-laco", "nome": "laço", "de": "vda", "para": "vda", "proto": "TCP", "porta": 443, "zona": "dc", "estagio": "dados", "preferencia": 1, "justificativa": "x", "confianca": "baixa"}]}, "espera": {"Sessão nova": {"nivel": "ok"}, "Sessão em andamento": {"nivel": "ok"}}, "descartadas": ["edt-dc", "hip-porta", "hip-proto", "hip-pref", "hip-laco"]},
+
+    {"nome": "hipotese IdP: Okta no lugar do AD, de pe, nao muda nada", "extensao": {"nos": [{"id": "hip-okta", "nome": "Okta", "zona": "citrix", "justificativa": "IdP passa a autenticar o Workspace", "confianca": "media"}], "fluxos": [{"id": "hip-auth-okta", "nome": "Autenticação no Okta", "de": "endpoint", "para": "hip-okta", "proto": "TCP", "porta": 443, "destino": "<tenant>.okta.com", "zona": "cliente", "estagio": "autorizacao", "papel": "principal", "preferencia": 1, "justificativa": "o login no portal passa pelo Okta", "confianca": "media"}]}, "espera": {"Sessão nova": {"nivel": "ok", "estagios": {"autorizacao": "principal"}}, "Sessão em andamento": {"nivel": "ok"}}, "descartadas": [], "varredura_inclui": ["n:hip-okta", "f:hip-auth-okta"]},
+    {"nome": "hipotese IdP: Okta fora, sessao nova abre pelo connection lease e a ativa nem sente", "extensao": {"nos": [{"id": "hip-okta", "nome": "Okta", "zona": "citrix", "justificativa": "IdP passa a autenticar o Workspace", "confianca": "media"}], "fluxos": [{"id": "hip-auth-okta", "nome": "Autenticação no Okta", "de": "endpoint", "para": "hip-okta", "proto": "TCP", "porta": 443, "destino": "<tenant>.okta.com", "zona": "cliente", "estagio": "autorizacao", "papel": "principal", "preferencia": 1, "justificativa": "o login no portal passa pelo Okta", "confianca": "media"}]}, "aplica": {"nos": {"hip-okta": false}}, "espera": {"Sessão nova": {"nivel": "deg", "estagios": {"autorizacao": "alternativo"}}, "Sessão em andamento": {"nivel": "ok"}}},
+    {"nome": "hipotese IdP: Okta fora com lease vencido derruba a sessao nova", "extensao": {"nos": [{"id": "hip-okta", "nome": "Okta", "zona": "citrix", "justificativa": "IdP passa a autenticar o Workspace", "confianca": "media"}], "fluxos": [{"id": "hip-auth-okta", "nome": "Autenticação no Okta", "de": "endpoint", "para": "hip-okta", "proto": "TCP", "porta": 443, "destino": "<tenant>.okta.com", "zona": "cliente", "estagio": "autorizacao", "papel": "principal", "preferencia": 1, "justificativa": "o login no portal passa pelo Okta", "confianca": "media"}]}, "aplica": {"nos": {"hip-okta": false}, "condicoes": {"lease-expirado": true}}, "espera": {"Sessão nova": {"nivel": "fail", "estagios": {"autorizacao": "falha"}}, "Sessão em andamento": {"nivel": "ok"}}}
+  ]
+}

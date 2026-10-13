@@ -1,0 +1,276 @@
+{
+  "schema": "gemeo-citrix/1.0",
+  "ambiente": "rendezvous-v2-base",
+  "descricao": "Rendezvous V2 + EDT — modelo base do caminho de rede. Nao separa sessao nova de sessao em andamento; para isso use o modelo de continuidade.",
+  "zonas": [
+    {
+      "id": "dc",
+      "nome": "Datacenter",
+      "detalhe": "rede onde fica o VDA",
+      "tipo": "proprio",
+      "cor": "amber"
+    },
+    {
+      "id": "cliente",
+      "nome": "Rede do cliente",
+      "detalhe": "fora do seu controle",
+      "tipo": "terceiro",
+      "cor": "blue"
+    },
+    {
+      "id": "citrix",
+      "nome": "Citrix Cloud",
+      "detalhe": "servico do fornecedor",
+      "tipo": "fornecedor",
+      "cor": "violet"
+    }
+  ],
+  "nos": [
+    {
+      "id": "vda",
+      "nome": "VDA",
+      "detalhe": "datacenter",
+      "zona": "dc",
+      "disponibilidade": false
+    },
+    {
+      "id": "endpoint",
+      "nome": "Endpoint",
+      "detalhe": "Citrix Workspace App",
+      "zona": "cliente",
+      "disponibilidade": false
+    },
+    {
+      "id": "cloud",
+      "nome": "Citrix Cloud",
+      "detalhe": "xendesktop.net",
+      "zona": "citrix",
+      "disponibilidade": true
+    },
+    {
+      "id": "ctrl",
+      "nome": "Endpoint de Controle",
+      "detalhe": "*.nssvc.net",
+      "zona": "citrix",
+      "disponibilidade": true
+    },
+    {
+      "id": "hdx",
+      "nome": "Endpoint de Dados HDX",
+      "detalhe": "*.nssvc.net",
+      "zona": "citrix",
+      "disponibilidade": true
+    }
+  ],
+  "estagios": [
+    {
+      "id": "registro",
+      "nome": "Registro",
+      "ordem": 1,
+      "exige": "todos",
+      "ok": "o VDA alcanca o plano de controle",
+      "falha": "o VDA nao chega ao plano de controle"
+    },
+    {
+      "id": "controle",
+      "nome": "Canal de controle",
+      "ordem": 2,
+      "exige": "todos",
+      "ok": "canal Rendezvous persistente aberto",
+      "falha": "sem canal de controle nao ha sessao"
+    },
+    {
+      "id": "dados",
+      "nome": "Transporte de dados",
+      "ordem": 3,
+      "exige": "preferencial",
+      "ok": "caminho de dados estabelecido",
+      "falha": "nenhum caminho chega ao dado HDX",
+      "caminhos": {
+        "1": "EDT sobre UDP 443",
+        "2": "TCP 443"
+      }
+    }
+  ],
+  "fluxos": [
+    {
+      "id": "reg",
+      "nome": "Registro do VDA",
+      "de": "vda",
+      "para": "cloud",
+      "proto": "TCP",
+      "porta": 443,
+      "destino": "xendesktop.net",
+      "zona": "dc",
+      "estagio": "registro",
+      "papel": "principal",
+      "padrao": true
+    },
+    {
+      "id": "ctl",
+      "nome": "Controle Rendezvous",
+      "de": "vda",
+      "para": "ctrl",
+      "proto": "TCP",
+      "porta": 443,
+      "destino": "*.nssvc.net",
+      "zona": "dc",
+      "estagio": "controle",
+      "papel": "principal",
+      "padrao": true
+    },
+    {
+      "id": "edt-dc",
+      "nome": "EDT saida do datacenter",
+      "de": "vda",
+      "para": "hdx",
+      "proto": "UDP",
+      "porta": 443,
+      "destino": "*.nssvc.net",
+      "zona": "dc",
+      "estagio": "dados",
+      "papel": "principal",
+      "padrao": true
+    },
+    {
+      "id": "tcp-dc",
+      "nome": "Fallback do datacenter",
+      "de": "vda",
+      "para": "hdx",
+      "proto": "TCP",
+      "porta": 443,
+      "destino": "*.nssvc.net",
+      "zona": "dc",
+      "estagio": "dados",
+      "papel": "fallback",
+      "padrao": true
+    },
+    {
+      "id": "edt-cli",
+      "nome": "EDT saida do cliente",
+      "de": "endpoint",
+      "para": "hdx",
+      "proto": "UDP",
+      "porta": 443,
+      "destino": "*.nssvc.net",
+      "zona": "cliente",
+      "estagio": "dados",
+      "papel": "principal",
+      "padrao": true
+    },
+    {
+      "id": "tcp-cli",
+      "nome": "Fallback do cliente",
+      "de": "endpoint",
+      "para": "hdx",
+      "proto": "TCP",
+      "porta": 443,
+      "destino": "*.nssvc.net",
+      "zona": "cliente",
+      "estagio": "dados",
+      "papel": "fallback",
+      "padrao": true
+    }
+  ],
+  "regras_sem_efeito": [
+    {
+      "id": "inbound",
+      "nome": "Qualquer porta inbound no VDA",
+      "detalhe": "teste: o modelo diz que nao precisa",
+      "zona": "dc",
+      "veredito": "Nenhum estagio deste modelo usa conexao de entrada. O VDA sempre inicia a conexao de saida. A regra pode sair do firewall."
+    },
+    {
+      "id": "legacy",
+      "nome": "UDP 2598 / TCP 1494 no VDA",
+      "detalhe": "teste: portas do modelo antigo",
+      "zona": "dc",
+      "veredito": "Sao as portas do caminho antigo via Cloud Connector. Com Rendezvous V2 o trafego vai todo em 443. A regra pode sair do firewall."
+    }
+  ],
+  "condicoes": [
+    {
+      "id": "tls",
+      "nome": "Inspecao TLS no proxy de saida",
+      "detalhe": "o proxy abre e reassina o TLS",
+      "zona": "dc",
+      "bloqueia": [
+        "reg",
+        "ctl",
+        "tcp-dc"
+      ],
+      "deteccao": "O coletor compara o emissor do certificado: se vier da CA interna, ha inspecao no caminho."
+    },
+    {
+      "id": "proxy-tcp",
+      "nome": "Proxy de saida so encaminha TCP",
+      "detalhe": "UDP nao atravessa o proxy",
+      "zona": "dc",
+      "bloqueia": [
+        "edt-dc"
+      ],
+      "deteccao": "Teste UDP 443 contra refletor proprio falha enquanto o TCP 443 passa."
+    },
+    {
+      "id": "ip-fixo",
+      "nome": "Firewall libera por IP, e o IP mudou",
+      "detalhe": "regra por IP em vez de FQDN",
+      "zona": "dc",
+      "bloqueia": [
+        "ctl",
+        "edt-dc",
+        "tcp-dc"
+      ],
+      "deteccao": "O coletor guarda o IP resolvido a cada coleta; mudanca de IP com TCP falhando indica esta causa."
+    },
+    {
+      "id": "udp-timeout",
+      "nome": "Timeout de sessao UDP curto",
+      "detalhe": "o firewall derruba fluxo ocioso",
+      "zona": "dc",
+      "degrada": [
+        "edt-dc"
+      ],
+      "efeito": "instavel",
+      "deteccao": "Sessoes medidas alternam entre EDT e TCP ao longo do dia."
+    },
+    {
+      "id": "mtu",
+      "nome": "MTU reduzida / fragmentacao bloqueada",
+      "detalhe": "no caminho ate o Gateway",
+      "zona": "dc",
+      "degrada": [
+        "edt-dc"
+      ],
+      "efeito": "instavel",
+      "deteccao": "Teste de payload UDP crescente contra refletor proprio corta em um tamanho especifico."
+    },
+    {
+      "id": "latencia-alta",
+      "nome": "Latência alta até o Gateway Service",
+      "detalhe": "PoP distante do ponto de saída",
+      "zona": "dc",
+      "degrada": [
+        "edt-dc",
+        "tcp-dc",
+        "edt-cli",
+        "tcp-cli"
+      ],
+      "efeito": "instavel",
+      "fonte": "derivada da medicao"
+    }
+  ],
+  "limiares": {
+    "rtt_ms": {
+      "aviso": 150,
+      "condicao": "latencia-alta",
+      "fluxos": [
+        "ctl",
+        "edt-dc",
+        "tcp-dc",
+        "edt-cli",
+        "tcp-cli"
+      ]
+    }
+  }
+}

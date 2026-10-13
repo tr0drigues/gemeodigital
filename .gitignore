@@ -1,0 +1,18 @@
+# credenciais nunca vão para o repositório
+credenciais.local.json
+*.local.json
+.env*
+
+# coletas reais carregam tenant e hostname: só os exemplos anonimizados entram
+coletas/*
+!coletas/2026-09-14_*.json
+!coletas/index.json
+
+# coletas brutas antes do merge, com FQDN de tenant
+estado-dc.json
+estado-cliente.json
+estado-observado.json
+
+__pycache__/
+*.pyc
+.DS_Store

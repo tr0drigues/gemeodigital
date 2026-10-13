@@ -1,0 +1,3072 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gêmeo digital — Citrix Rendezvous V2 + EDT</title>
+  <style>
+    :root {
+      --bg: #f6f5f2;
+      --panel: #ffffff;
+      --panel2: #f0efeb;
+      --line: #dcd9d2;
+      --soft: #ebe9e3;
+      --ink: #1f2328;
+      --mute: #5f6670;
+      --dim: #767c85;
+      --amber: #8f5309;
+      --green: #127355;
+      --red: #bb2d23;
+      --blue: #1f5fbf;
+      --violet: #6d3fc4;
+      --amber-bg: rgba(168, 98, 11, .09);
+      --green-bg: rgba(18, 115, 85, .09);
+      --red-bg: rgba(187, 45, 35, .08);
+      --blue-bg: rgba(31, 95, 191, .09);
+      --violet-bg: rgba(109, 63, 196, .09);
+      --mono: "SF Mono", "Menlo", "Consolas", "Courier New", monospace;
+      --disp: "Avenir Next Condensed", "Futura", "Gill Sans", "Trebuchet MS", sans-serif;
+      --body: "Avenir Next", "Optima", "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--body);
+      font-size: 14px;
+      line-height: 1.5;
+      background-image:
+        radial-gradient(900px 500px at 82% -12%, rgba(168, 98, 11, .05), transparent 60%),
+        radial-gradient(700px 420px at 0% 100%, rgba(31, 95, 191, .04), transparent 60%);
+      background-attachment: fixed;
+    }
+
+    header {
+      border-bottom: 1px solid var(--line);
+      padding: 16px 24px 14px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+      background: rgba(255, 255, 255, .7);
+    }
+
+    h1 {
+      font-family: var(--disp);
+      font-size: 24px;
+      letter-spacing: .055em;
+      text-transform: uppercase;
+      margin: 0;
+      font-weight: 600
+    }
+
+    h1 span {
+      color: var(--amber)
+    }
+
+    .sub {
+      color: var(--mute);
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: .05em;
+      margin-top: 5px
+    }
+
+    .mode {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+      border: 1px solid var(--line);
+      border-radius: 2px;
+      padding: 6px 11px;
+      color: var(--mute);
+      white-space: nowrap;
+    }
+
+    .mode.sim {
+      border-color: var(--line)
+    }
+
+    .vivo {
+      align-items: center;
+      gap: 6px;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--green)
+    }
+
+    .vivo i {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      display: inline-block;
+      animation: bate 2s ease-in-out infinite
+    }
+
+    @keyframes bate {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: .25
+      }
+    }
+
+    .mode.pulso {
+      animation: realce .9s ease-out
+    }
+
+    @keyframes realce {
+      0% {
+        box-shadow: 0 0 0 0 var(--green-bg)
+      }
+
+      100% {
+        box-shadow: 0 0 0 12px transparent
+      }
+    }
+
+    .mode.esp {
+      border-color: var(--green);
+      color: var(--green);
+      background: var(--green-bg)
+    }
+
+    .mode.hip {
+      border-color: var(--amber);
+      color: var(--amber);
+      background: var(--amber-bg)
+    }
+
+    .wrap {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      min-height: calc(100vh - 82px)
+    }
+
+    aside {
+      border-right: 1px solid var(--line);
+      padding: 18px 16px 60px;
+      background: rgba(255, 255, 255, .6);
+      min-width: 0
+    }
+
+    main {
+      padding: 20px 24px 70px;
+      min-width: 0
+    }
+
+    @media (max-width:1060px) {
+      .wrap {
+        grid-template-columns: 1fr
+      }
+
+      aside {
+        border-right: 0;
+        border-bottom: 1px solid var(--line)
+      }
+    }
+
+    .sec {
+      margin-bottom: 24px
+    }
+
+    details.conf {
+      border-top: 1px solid var(--soft);
+      padding-top: 12px;
+      margin-top: 6px
+    }
+
+    details.conf>summary {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--dim);
+      cursor: pointer;
+      list-style: none;
+      padding: 4px 0;
+    }
+
+    details.conf>summary::-webkit-details-marker {
+      display: none
+    }
+
+    details.conf>summary::before {
+      content: "+ ";
+      font-family: var(--mono)
+    }
+
+    details.conf[open]>summary::before {
+      content: "− "
+    }
+
+    details.conf>summary:hover {
+      color: var(--amber)
+    }
+
+    details.tab {
+      margin-bottom: 18px
+    }
+
+    details.tab>summary {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--dim);
+      cursor: pointer;
+      list-style: none;
+      padding: 9px 14px;
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      background: var(--panel);
+    }
+
+    details.tab>summary::-webkit-details-marker {
+      display: none
+    }
+
+    details.tab>summary::before {
+      content: "+ ";
+      font-family: var(--mono)
+    }
+
+    details.tab[open]>summary::before {
+      content: "− "
+    }
+
+    details.tab>summary:hover {
+      color: var(--amber)
+    }
+
+    details.tab[open]>summary {
+      border-radius: 5px 5px 0 0;
+      border-bottom: 0
+    }
+
+    details.tab .card {
+      margin: 0;
+      border-radius: 0 0 5px 5px;
+      border-top: 0;
+      box-shadow: none
+    }
+
+    .sec-title {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--dim);
+      margin: 0 0 10px;
+      padding-bottom: 7px;
+      border-bottom: 1px solid var(--soft);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .sec-title a {
+      color: var(--mute);
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 9.5px;
+      letter-spacing: .08em
+    }
+
+    .sec-title a:hover {
+      color: var(--amber)
+    }
+
+    input[type=text],
+    textarea {
+      width: 100%;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      color: var(--ink);
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 7px 9px;
+      border-radius: 3px;
+    }
+
+    input[type=text]:focus,
+    textarea:focus {
+      outline: none;
+      border-color: var(--amber)
+    }
+
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+      line-height: 1.45
+    }
+
+    .row {
+      display: flex;
+      gap: 6px;
+      margin-top: 6px;
+      flex-wrap: wrap
+    }
+
+    .btn {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      color: var(--ink);
+      font-family: var(--body);
+      font-size: 11.5px;
+      padding: 6px 11px;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: border-color .15s, background .15s;
+    }
+
+    .btn:hover {
+      border-color: var(--amber);
+      background: var(--panel2)
+    }
+
+    .btn.ghost {
+      color: var(--mute)
+    }
+
+    .src {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--mute);
+      margin-top: 8px;
+      line-height: 1.5
+    }
+
+    .src b {
+      color: var(--ink);
+      font-weight: 600
+    }
+
+    .src .err {
+      color: var(--red)
+    }
+
+    .src .good {
+      color: var(--green)
+    }
+
+    .hidden {
+      display: none
+    }
+
+    .scn {
+      display: flex;
+      flex-direction: column;
+      gap: 5px
+    }
+
+    .scn button {
+      text-align: left;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      color: var(--ink);
+      font-family: var(--body);
+      font-size: 12.5px;
+      padding: 8px 10px;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: .15s
+    }
+
+    .scn button:hover {
+      border-color: var(--amber);
+      background: var(--panel2)
+    }
+
+    .scn button.on {
+      border-color: var(--amber);
+      background: var(--amber-bg)
+    }
+
+    .scn small {
+      display: block;
+      color: var(--mute);
+      font-size: 10.5px;
+      margin-top: 2px;
+      line-height: 1.35
+    }
+
+    .tog {
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+      padding: 6px 0;
+      cursor: pointer;
+      user-select: none
+    }
+
+    .tog input {
+      display: none
+    }
+
+    .sw {
+      flex: 0 0 30px;
+      height: 16px;
+      border-radius: 9px;
+      background: #e3e0d9;
+      border: 1px solid var(--line);
+      position: relative;
+      margin-top: 2px;
+      transition: .18s
+    }
+
+    .sw::after {
+      content: "";
+      position: absolute;
+      top: 1px;
+      left: 1px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
+      transition: .18s
+    }
+
+    .tog input:checked+.sw {
+      background: var(--green-bg);
+      border-color: var(--green)
+    }
+
+    .tog input:checked+.sw::after {
+      transform: translateX(14px);
+      background: var(--green)
+    }
+
+    .tog.danger input:checked+.sw {
+      background: var(--red-bg);
+      border-color: var(--red)
+    }
+
+    .tog.danger input:checked+.sw::after {
+      background: var(--red)
+    }
+
+    .tog .txt {
+      font-size: 12.5px;
+      line-height: 1.35;
+      min-width: 0
+    }
+
+    .tog .txt em {
+      display: block;
+      font-style: normal;
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--mute);
+      margin-top: 2px
+    }
+
+    .meas {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: .09em;
+      padding: 1px 5px;
+      border-radius: 2px;
+      margin-left: 6px;
+      background: var(--green-bg);
+      color: var(--green);
+      text-transform: uppercase
+    }
+
+    .meas.div {
+      background: var(--amber-bg);
+      color: var(--amber)
+    }
+
+    .zone-tag {
+      font-family: var(--mono);
+      font-size: 9.5px;
+      letter-spacing: .09em;
+      padding: 2px 6px;
+      border-radius: 2px;
+      text-transform: uppercase;
+      white-space: nowrap
+    }
+
+    .z-amber {
+      background: var(--amber-bg);
+      color: var(--amber)
+    }
+
+    .z-blue {
+      background: var(--blue-bg);
+      color: var(--blue)
+    }
+
+    .z-violet {
+      background: var(--violet-bg);
+      color: var(--violet)
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      background: var(--panel);
+      margin-bottom: 18px;
+      box-shadow: 0 1px 2px rgba(31, 35, 40, .04)
+    }
+
+    .card-h {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--soft);
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--dim)
+    }
+
+    .card-b {
+      padding: 14px
+    }
+
+    svg {
+      display: block;
+      width: 100%;
+      height: auto
+    }
+
+    .zone-box {
+      fill: none;
+      stroke: var(--line);
+      stroke-width: 1
+    }
+
+    .zone-lbl {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: .11em;
+      text-transform: uppercase
+    }
+
+    .zone-sub {
+      font-family: var(--mono);
+      font-size: 9.5px;
+      letter-spacing: .07em;
+      fill: var(--dim)
+    }
+
+    .node-lbl {
+      font-family: var(--body);
+      font-size: 13px;
+      fill: var(--ink);
+      text-anchor: middle
+    }
+
+    .node-sub {
+      font-family: var(--mono);
+      font-size: 9.5px;
+      fill: var(--mute);
+      text-anchor: middle
+    }
+
+    .edge {
+      fill: none;
+      stroke-width: 2;
+      transition: stroke .25s
+    }
+
+    .edge.ok {
+      stroke: var(--green)
+    }
+
+    .edge.deg {
+      stroke: var(--amber);
+      stroke-dasharray: 7 4
+    }
+
+    .edge.idle {
+      stroke: var(--dim);
+      stroke-dasharray: 2 5
+    }
+
+    .edge.blocked {
+      stroke: var(--red);
+      stroke-dasharray: 5 5
+    }
+
+    .edge.unreached {
+      stroke: #d6d3cc;
+      stroke-dasharray: 2 6
+    }
+
+    .elbl {
+      font-family: var(--mono);
+      font-size: 9.5px;
+      text-anchor: middle
+    }
+
+    .xmark {
+      stroke: var(--red);
+      stroke-width: 2
+    }
+
+    .lgd {
+      font-family: var(--mono);
+      font-size: 9.5px;
+      fill: var(--mute);
+      letter-spacing: .05em
+    }
+
+    .verdict {
+      border-radius: 4px;
+      border: 1px solid var(--line);
+      overflow: hidden;
+      margin-bottom: 18px
+    }
+
+    .v-bar {
+      padding: 13px 18px;
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      flex-wrap: wrap
+    }
+
+    .v-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      flex: 0 0 auto
+    }
+
+    .v-title {
+      font-family: var(--disp);
+      font-size: 19px;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      font-weight: 600
+    }
+
+    .v-tag {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .1em;
+      color: var(--mute);
+      text-transform: uppercase;
+      margin-left: auto
+    }
+
+    .v-ok {
+      background: var(--green-bg);
+      border-bottom: 1px solid var(--green)
+    }
+
+    .v-ok .v-dot {
+      background: var(--green)
+    }
+
+    .v-ok .v-title {
+      color: var(--green)
+    }
+
+    .v-deg {
+      background: var(--amber-bg);
+      border-bottom: 1px solid var(--amber)
+    }
+
+    .v-deg .v-dot {
+      background: var(--amber)
+    }
+
+    .v-deg .v-title {
+      color: var(--amber)
+    }
+
+    .v-fail {
+      background: var(--red-bg);
+      border-bottom: 1px solid var(--red)
+    }
+
+    .v-fail .v-dot {
+      background: var(--red)
+    }
+
+    .v-fail .v-title {
+      color: var(--red)
+    }
+
+    .stages {
+      display: grid;
+      gap: 1px;
+      background: var(--soft)
+    }
+
+    .stage {
+      background: var(--panel);
+      padding: 12px 14px
+    }
+
+    .stage .k {
+      font-family: var(--mono);
+      font-size: 9.5px;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+      color: var(--dim)
+    }
+
+    .stage .v {
+      font-size: 13px;
+      margin-top: 5px;
+      font-weight: 600
+    }
+
+    .stage .d {
+      font-size: 11.5px;
+      color: var(--mute);
+      margin-top: 3px;
+      line-height: 1.4
+    }
+
+    .cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px
+    }
+
+    @media (max-width:900px) {
+      .cols {
+        grid-template-columns: 1fr
+      }
+    }
+
+    .cause {
+      border-left: 2px solid var(--red);
+      padding: 8px 0 8px 12px;
+      margin-bottom: 10px;
+      background: var(--red-bg)
+    }
+
+    .cause .t {
+      font-size: 12.5px
+    }
+
+    .cause .a {
+      font-size: 11.5px;
+      color: var(--mute);
+      margin-top: 4px
+    }
+
+    .cause .a b {
+      color: var(--ink);
+      font-weight: 600
+    }
+
+    .note {
+      border-left: 2px solid var(--line);
+      padding: 8px 0 8px 12px;
+      margin-bottom: 10px
+    }
+
+    .note .t {
+      font-size: 12.5px
+    }
+
+    .note .a {
+      font-size: 11.5px;
+      color: var(--mute);
+      margin-top: 4px
+    }
+
+    .symp {
+      border: 1px dashed var(--line);
+      border-radius: 3px;
+      padding: 12px 14px;
+      font-size: 12.5px;
+      line-height: 1.55
+    }
+
+    .symp b {
+      color: var(--amber);
+      font-weight: 600
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--mono);
+      font-size: 11px
+    }
+
+    th {
+      text-align: left;
+      color: var(--dim);
+      font-weight: 400;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      font-size: 9.5px;
+      padding: 6px 8px;
+      border-bottom: 1px solid var(--soft)
+    }
+
+    td {
+      padding: 7px 8px;
+      border-bottom: 1px solid var(--soft)
+    }
+
+    tr:last-child td {
+      border-bottom: 0
+    }
+
+    td.na {
+      color: var(--dim)
+    }
+
+    .pill {
+      font-size: 9.5px;
+      letter-spacing: .07em;
+      padding: 2px 6px;
+      border-radius: 2px;
+      text-transform: uppercase;
+      white-space: nowrap
+    }
+
+    .p-use {
+      background: var(--green-bg);
+      color: var(--green)
+    }
+
+    .p-idle {
+      background: var(--soft);
+      color: var(--mute)
+    }
+
+    .p-dead {
+      background: var(--red-bg);
+      color: var(--red)
+    }
+
+    .p-null {
+      background: var(--amber-bg);
+      color: var(--amber)
+    }
+
+    .fact {
+      display: flex;
+      gap: 9px;
+      align-items: flex-start;
+      padding: 7px 0;
+      border-bottom: 1px solid var(--soft);
+      font-size: 12.5px
+    }
+
+    .fact:last-child {
+      border-bottom: 0
+    }
+
+    .fact code {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--ink);
+      background: var(--soft);
+      padding: 1px 5px;
+      border-radius: 2px
+    }
+
+    .fact .why {
+      color: var(--mute);
+      font-size: 11.5px;
+      margin-top: 2px
+    }
+
+    .ev {
+      font-family: var(--mono);
+      font-size: 11px;
+      line-height: 1.7
+    }
+
+    .ev .k {
+      color: var(--dim)
+    }
+
+    .ev .v {
+      color: var(--ink)
+    }
+
+    .ev .bad {
+      color: var(--red)
+    }
+
+    .ev .good {
+      color: var(--green)
+    }
+
+    .ev .warn {
+      color: var(--amber)
+    }
+
+    .ai-body {
+      font-size: 13px;
+      line-height: 1.6
+    }
+
+    .ai-body p {
+      margin: 0 0 12px
+    }
+
+    .ai-item {
+      border-left: 2px solid var(--line);
+      padding: 8px 0 8px 12px;
+      margin-bottom: 10px
+    }
+
+    .ai-item.fora {
+      border-left-color: var(--red);
+      background: var(--red-bg)
+    }
+
+    .ai-item.mud {
+      border-left-color: var(--amber)
+    }
+
+    .ai-item.hip {
+      border-left: 2px dashed var(--violet);
+      background: var(--violet-bg)
+    }
+
+    .ai-item.hip .t b { color: var(--violet) }
+
+    .cmp {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      gap: 4px 10px;
+      font-size: 12.5px;
+      margin: 4px 0 12px
+    }
+
+    .cmp .k { grid-column: 1 / -1; color: var(--mute); font-family: var(--mono); font-size: 11px; margin-top: 6px }
+    .cmp .seta { color: var(--dim) }
+    .cmp .n-ok { color: var(--green) }
+    .cmp .n-deg { color: var(--amber) }
+    .cmp .n-fail { color: var(--red) }
+
+    .candidata summary { cursor: pointer; color: var(--mute); font-size: 12px; margin: 6px 0 }
+    .candidata pre {
+      font-family: var(--mono); font-size: 11px; white-space: pre-wrap; overflow-wrap: anywhere;
+      border: 1px solid var(--line); border-radius: 3px; padding: 10px; margin: 6px 0 0
+    }
+
+    .entendi {
+      border: 1px dashed var(--line);
+      border-radius: 3px;
+      padding: 12px 14px;
+      margin-bottom: 12px;
+      font-size: 13px;
+      line-height: 1.55
+    }
+
+    .entendi b {
+      color: var(--amber)
+    }
+
+    .perg-row {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      margin-top: 8px
+    }
+
+    .ai-item .t {
+      font-size: 12.5px
+    }
+
+    .ai-item .e {
+      font-size: 11.5px;
+      color: var(--mute);
+      margin-top: 4px
+    }
+
+    .conf {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: .08em;
+      padding: 1px 5px;
+      border-radius: 2px;
+      text-transform: uppercase;
+      margin-left: 6px
+    }
+
+    .c-alta {
+      background: var(--green-bg);
+      color: var(--green)
+    }
+
+    .c-media {
+      background: var(--amber-bg);
+      color: var(--amber)
+    }
+
+    .c-baixa {
+      background: var(--red-bg);
+      color: var(--red)
+    }
+
+    .base-tag {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: .09em;
+      padding: 2px 6px;
+      border-radius: 2px;
+      text-transform: uppercase
+    }
+
+    .b-med {
+      background: var(--green-bg);
+      color: var(--green)
+    }
+
+    .b-sim {
+      background: var(--amber-bg);
+      color: var(--amber)
+    }
+
+    .vazio {
+      color: var(--mute);
+      font-size: 12.5px;
+      line-height: 1.55
+    }
+
+    .sweep-sum {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--soft);
+      margin-bottom: 14px
+    }
+
+    .sweep-sum>div {
+      background: var(--panel);
+      padding: 11px 13px
+    }
+
+    .sweep-sum .n {
+      font-family: var(--disp);
+      font-size: 23px;
+      letter-spacing: .04em
+    }
+
+    .sweep-sum .l {
+      font-family: var(--mono);
+      font-size: 9.5px;
+      letter-spacing: .11em;
+      text-transform: uppercase;
+      color: var(--dim);
+      margin-top: 3px
+    }
+
+    @media (max-width:720px) {
+      .sweep-sum {
+        grid-template-columns: repeat(2, 1fr)
+      }
+    }
+
+    .sw-row {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--soft);
+      font-size: 12.5px
+    }
+
+    .sw-row:last-child {
+      border-bottom: 0
+    }
+
+    .sw-row .ev {
+      font-family: var(--mono);
+      font-size: 11px;
+      line-height: 1.5;
+      flex: 1;
+      min-width: 0
+    }
+
+    .sw-row .ev b {
+      color: var(--ink);
+      font-weight: 600
+    }
+
+    .sw-row .ev span {
+      color: var(--mute)
+    }
+
+    .sw-tag {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: .08em;
+      padding: 2px 6px;
+      border-radius: 2px;
+      text-transform: uppercase;
+      white-space: nowrap;
+      flex: 0 0 auto
+    }
+
+    .t-fail {
+      background: var(--red-bg);
+      color: var(--red)
+    }
+
+    .t-deg {
+      background: var(--amber-bg);
+      color: var(--amber)
+    }
+
+    .t-ok {
+      background: var(--soft);
+      color: var(--mute)
+    }
+
+    .sw-h {
+      font-family: var(--mono);
+      font-size: 9.5px;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+      color: var(--dim);
+      margin: 16px 0 4px;
+      padding-bottom: 5px;
+      border-bottom: 1px solid var(--soft)
+    }
+
+    .sw-apply {
+      background: none;
+      border: 1px solid var(--line);
+      color: var(--mute);
+      font-size: 10px;
+      font-family: var(--mono);
+      padding: 2px 7px;
+      border-radius: 2px;
+      cursor: pointer;
+      flex: 0 0 auto
+    }
+
+    .sw-apply:hover {
+      border-color: var(--amber);
+      color: var(--amber)
+    }
+
+    footer {
+      padding: 0 24px 40px;
+      color: var(--dim);
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .04em;
+      line-height: 1.6
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div>
+      <h1>Gêmeo digital · <span>Rendezvous V2 + EDT</span></h1>
+      <div class="sub" id="envline">carregando ambiente…</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <span id="aoVivo" class="vivo" style="display:none"><i></i>ao vivo</span>
+      <div class="mode sim" id="modeTag">modo simulação</div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <aside>
+
+      <div class="sec">
+        <p class="sec-title"><span>Cenários</span><a id="btnScnExport">exportar atual</a></p>
+        <div class="scn" id="scn"></div>
+        <div id="scnExportBox" class="hidden" style="margin-top:8px">
+          <textarea id="scnExport" readonly style="min-height:120px"></textarea>
+        </div>
+      </div>
+
+      <div id="flowGroups"></div>
+
+      <div class="sec">
+        <p class="sec-title"><span>Condições do caminho</span></p>
+        <div id="conds"></div>
+      </div>
+
+      <div class="sec">
+        <p class="sec-title"><span>Disponibilidade do fornecedor</span></p>
+        <div id="avail"></div>
+      </div>
+
+      <details class="conf">
+        <summary>Fontes e integrações</summary>
+
+        <div class="sec" style="margin-top:14px">
+          <p class="sec-title"><span>Topologia</span><a id="tgl-paste">colar</a></p>
+          <input type="text" id="envUrl" placeholder="URL do ambiente.json">
+          <div class="row">
+            <button class="btn" id="btnEnvUrl">Carregar</button>
+            <button class="btn ghost" id="btnEnvFile">Arquivo</button>
+            <input type="file" id="envFile" accept=".json" class="hidden">
+          </div>
+          <div id="pasteBox" class="hidden" style="margin-top:8px">
+            <textarea id="envPaste" placeholder="cole o conteúdo do ambiente.json"></textarea>
+            <div class="row"><button class="btn" id="btnEnvPaste">Aplicar</button></div>
+          </div>
+          <div class="src" id="envSrc"></div>
+        </div>
+
+        <div class="sec">
+          <p class="sec-title"><span>Cenários</span></p>
+          <input type="text" id="scnUrl" placeholder="URL do cenarios.json">
+          <div class="row">
+            <button class="btn" id="btnScnUrl">Carregar</button>
+            <button class="btn ghost" id="btnScnFile">Arquivo</button>
+            <input type="file" id="scnFile" accept=".json" class="hidden">
+            <button class="btn ghost" id="btnScnAi">IA: sugerir</button>
+          </div>
+          <div class="src" id="scnSrc">nenhum cenário carregado.</div>
+        </div>
+
+        <div class="sec">
+          <p class="sec-title"><span>Coleta</span><a id="btnObsClear">limpar</a></p>
+          <input type="text" id="obsUrl" placeholder="URL do estado observado">
+          <div class="row">
+            <button class="btn" id="btnObsUrl">Carregar</button>
+            <button class="btn ghost" id="btnObsFile">Arquivo</button>
+            <input type="file" id="obsFile" accept=".json" class="hidden">
+          </div>
+          <div class="src" id="obsSrc">nenhuma coleta carregada.</div>
+        </div>
+
+        <div class="sec" style="margin-bottom:6px">
+          <p class="sec-title"><span>Análise por IA</span><a id="aiClear">esquecer chave</a></p>
+          <input type="password" id="aiKey" placeholder="chave do OpenRouter" autocomplete="off">
+          <input type="text" id="aiModel" value="anthropic/claude-sonnet-5" placeholder="modelo do OpenRouter"
+            style="margin-top:6px">
+          <div class="row"><button class="btn" id="btnAi">Analisar estado atual</button></div>
+          <div class="src" id="aiSrc">a chave fica só na memória desta aba.</div>
+        </div>
+
+      </details>
+
+    </aside>
+
+    <main>
+      <div class="verdict" id="verdict"></div>
+
+      <div class="card">
+        <div class="card-h"><span>Fluxo de rede</span><span id="transportTag"></span></div>
+        <div class="card-b">
+          <div class="row" id="perfilSel" style="margin:0 0 12px"></div>
+          <div id="svgHost"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><span>Validar uma mudança</span><span id="pergTag"
+            style="text-transform:none;letter-spacing:.04em;color:var(--dim)"></span></div>
+        <div class="card-b">
+          <textarea id="pergunta" style="min-height:64px"
+            placeholder="descreva a mudança em texto — ex: vamos ligar inspeção TLS na saída e trocar o proxy do HDX por HTTP"></textarea>
+          <div class="perg-row">
+            <button class="btn" id="btnPerg">Traduzir e simular</button>
+            <button class="btn ghost hidden" id="btnPergUndo">Desfazer</button>
+          </div>
+          <div id="pergOut" style="margin-top:12px"></div>
+        </div>
+      </div>
+
+      <div class="cols">
+        <div class="card">
+          <div class="card-h"><span>Fatos do motor</span><span
+              style="text-transform:none;letter-spacing:.04em;color:var(--dim)">calculado</span></div>
+          <div class="card-b" id="facts"></div>
+        </div>
+        <div class="card">
+          <div class="card-h"><span>Evidência medida</span><span id="evTag"
+              style="text-transform:none;letter-spacing:.04em;color:var(--dim)"></span></div>
+          <div class="card-b">
+            <div class="ev" id="evidence"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><span>Análise</span><span id="aiTag"
+            style="text-transform:none;letter-spacing:.04em;color:var(--dim)"></span></div>
+        <div class="card-b">
+          <div class="ai-body" id="analysis"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><span>Varredura de falhas</span><span id="sweepTag"
+            style="text-transform:none;letter-spacing:.04em;color:var(--dim)"></span></div>
+        <div class="card-b">
+          <div class="row" style="margin:0 0 12px">
+            <button class="btn" id="btnSweep1">Varrer 1 evento</button>
+            <button class="btn" id="btnSweep2">Varrer 1 e 2 eventos</button>
+          </div>
+          <div id="sweep">
+            <div class="vazio">O painel responde à falha que você marca. A varredura faz o inverso: testa todas as
+              combinações contra o motor e mostra o que derruba, o que degrada sem dar erro e o que não muda nada.</div>
+          </div>
+        </div>
+      </div>
+
+      <details class="tab">
+        <summary>Regras efetivas no firewall</summary>
+        <div class="card">
+          <div class="card-b" style="padding:4px 8px 8px">
+            <table id="fwtable"></table>
+          </div>
+        </div>
+      </details>
+    </main>
+  </div>
+
+  <footer>Motor determinístico · medição vem do coletor, não do navegador</footer>
+
+  <script>
+    "use strict";
+
+    /* ======================= ESTADO ======================= */
+    let ENV = null;
+    let OBS = null;                 // estado observado (medido)
+    let cenarioAtivo = "base";
+    const S = { fluxos: {}, condicoes: {}, nos: {}, sem_efeito: {}, perfil: null };
+
+    function divergeDoObservado() {
+      if (!OBS || !OBS.fluxos) return [];
+      return Object.keys(OBS.fluxos).filter(id => {
+        const m = idModelo(id);
+        return (m in S.fluxos) && S.fluxos[m] !== (OBS.fluxos[id].estado === "ok");
+      });
+    }
+
+    /* ======================= MOTOR ======================= */
+    /* ===== MOTOR:INICIO — daqui até MOTOR:FIM roda fora do browser (twin.py) ===== */
+    function zcls(zid) { const z = ENV.zonas.find(x => x.id === zid); return "z-" + ((z && z.cor) || "amber"); }
+    function znome(zid) { const z = ENV.zonas.find(x => x.id === zid); return z ? z.nome : zid; }
+
+    function perfisDoEnv() {
+      return (ENV.perfis && ENV.perfis.length) ? ENV.perfis : [{ id: "sessao", nome: "Sessão", detalhe: "" }];
+    }
+
+    function resetEstado() {
+      S.fluxos = {}; S.condicoes = {}; S.nos = {}; S.sem_efeito = {};
+      ENV.fluxos.forEach(f => S.fluxos[f.id] = f.padrao !== false);
+      (ENV.condicoes || []).forEach(c => S.condicoes[c.id] = false);
+      ENV.nos.forEach(n => { if (n.disponibilidade) S.nos[n.id] = true; });
+      S.perfil = perfisDoEnv()[0].id;
+      (ENV.regras_sem_efeito || []).forEach(r => S.sem_efeito[r.id] = false);
+    }
+
+    // O coletor grava ids genéricos (tls, ctl, reg...). Cada ambiente declara em
+    // aliases_observados como eles se chamam no modelo.
+    function idModelo(id) { return ((ENV.aliases_observados || {})[id]) || id; }
+
+    function aplicarObservado() {
+      if (!OBS || !OBS.fluxos) return;
+      Object.keys(OBS.fluxos).forEach(id => {
+        const m = idModelo(id);
+        if (m in S.fluxos) S.fluxos[m] = (OBS.fluxos[id].estado === "ok");
+      });
+      if (OBS.nos) Object.keys(OBS.nos).forEach(id => { const m = idModelo(id); if (m in S.nos) S.nos[m] = !!OBS.nos[id]; });
+      if (OBS.condicoes) Object.keys(OBS.condicoes).forEach(id => {
+        const m = idModelo(id);
+        if (m in S.condicoes) S.condicoes[m] = S.condicoes[m] || !!OBS.condicoes[id];
+      });
+
+      // latência medida vira condição, quando o ambiente define um limiar.
+      // Com lim.fluxos, só contam os fluxos listados: RTT do registro no Cloud
+      // não é latência até o Gateway.
+      const lim = (ENV.limiares || {}).rtt_ms;
+      if (lim && lim.condicao && (lim.condicao in S.condicoes)) {
+        const conta = id => !lim.fluxos || lim.fluxos.indexOf(idModelo(id)) >= 0;
+        const rtts = [];
+        Object.keys(OBS.fluxos).filter(conta).forEach(id => {
+          const f = OBS.fluxos[id];
+          if (typeof f.rtt_ms === "number") rtts.push(f.rtt_ms);
+        });
+        Object.keys(OBS.medicoes || {}).filter(conta).forEach(id => {
+          OBS.medicoes[id].forEach(m => { if (typeof m.rtt_ms === "number") rtts.push(m.rtt_ms); });
+        });
+        if (rtts.length && Math.max.apply(null, rtts) > lim.aviso) S.condicoes[lim.condicao] = true;
+      }
+    }
+
+    function avaliar() {
+      const bloqueios = {}, degrada = {};
+      ENV.fluxos.forEach(f => { bloqueios[f.id] = []; degrada[f.id] = []; });
+      const noZona = {}; ENV.nos.forEach(n => noZona[n.id] = n.zona);
+
+      ENV.fluxos.forEach(f => {
+        if (!S.fluxos[f.id]) bloqueios[f.id].push({
+          zona: f.zona, tipo: "regra-ausente", fluxo: f.id,
+          alvo: f.proto === "LOCAL" ? f.destino : f.proto + " " + f.porta + " → " + f.destino
+        });
+        [f.de, f.para].forEach(nid => {
+          if (nid in S.nos && !S.nos[nid]) {
+            const n = ENV.nos.find(x => x.id === nid);
+            bloqueios[f.id].push({ zona: noZona[nid], tipo: "componente-indisponivel", fluxo: f.id, alvo: n.nome });
+          }
+        });
+      });
+
+      (ENV.condicoes || []).forEach(c => {
+        if (!S.condicoes[c.id]) return;
+        (c.bloqueia || []).forEach(fid => {
+          if (bloqueios[fid]) bloqueios[fid].push({ zona: c.zona, tipo: "condicao", fluxo: fid, alvo: c.nome, refId: c.id, fonte: c.fonte });
+        });
+        (c.degrada || []).forEach(fid => {
+          if (degrada[fid]) degrada[fid].push({ zona: c.zona, tipo: "condicao", fluxo: fid, alvo: c.nome, refId: c.id, fonte: c.fonte, efeito: c.efeito || "instavel", degradacao: true });
+        });
+      });
+
+      const up = id => bloqueios[id].length === 0;
+      const perfis = perfisDoEnv().map(p => avaliarPerfil(p, up, degrada));
+      const ativo = perfis.find(p => p.id === S.perfil) || perfis[0];
+
+      const cls = {};
+      ENV.fluxos.forEach(f => {
+        const r = ativo.res[f.estagio];
+        if (!r) { cls[f.id] = "unreached"; return; }                 // estágio fora deste perfil
+        if (!up(f.id)) { cls[f.id] = (r.status === "nao-avaliado") ? "unreached" : "blocked"; return; }
+        if (r.status === "nao-avaliado") { cls[f.id] = "unreached"; return; }
+        if ((r.fluxosAtivos || []).indexOf(f.id) >= 0)
+          cls[f.id] = (r.status === "ok" || r.status === "principal") ? "ok" : "deg";
+        else cls[f.id] = "idle";
+      });
+
+      return {
+        bloqueios, degrada, up, perfis, ativo, cls,
+        nivel: ativo.nivel, titulo: ativo.titulo, tag: ativo.tag, res: ativo.res, estagios: ativo.estagios
+      };
+    }
+
+    function avaliarPerfil(p, up, degrada) {
+      const estagios = ENV.estagios
+        .filter(e => !e.perfis || e.perfis.indexOf(p.id) >= 0)
+        .slice().sort((a, b) => a.ordem - b.ordem);
+
+      const res = {}; let anteriorOk = true;
+
+      estagios.forEach(e => {
+        const fl = ENV.fluxos.filter(f => f.estagio === e.id);
+        if (!anteriorOk) { res[e.id] = { status: "nao-avaliado", fluxosAtivos: [] }; return; }
+
+        if (e.exige === "preferencial") {
+          const grupos = {};
+          fl.forEach(f => {
+            const k = f.preferencia || (f.papel === "fallback" || f.papel === "alternativo" ? 2 : 1);
+            (grupos[k] = grupos[k] || []).push(f);
+          });
+          const chaves = Object.keys(grupos).map(Number).sort((a, b) => a - b);
+          let escolhido = null;
+          for (let x = 0; x < chaves.length; x++) {
+            if (grupos[chaves[x]].every(f => up(f.id))) { escolhido = chaves[x]; break; }
+          }
+          if (escolhido === null) { res[e.id] = { status: "falha", fluxosAtivos: [] }; anteriorOk = false; return; }
+
+          const g = grupos[escolhido];
+          const deg = g.some(f => degrada[f.id].length);
+          const primario = escolhido === chaves[0];
+          res[e.id] = {
+            status: primario ? (deg ? "principal-degradado" : "principal") : (deg ? "alternativo-degradado" : "alternativo"),
+            fluxosAtivos: g.map(f => f.id),
+            preferencia: escolhido,
+            caminho: (e.caminhos || {})[String(escolhido)] || (g.find(f => f.caminho) || {}).caminho || null
+          };
+          if (!primario) {
+            const g1 = grupos[chaves[0]];
+            const okP = g1.filter(f => up(f.id)), noP = g1.filter(f => !up(f.id));
+            if (okP.length && noP.length)
+              res[e.id].assimetria = { faltando: noP.map(f => znome(f.zona)), ok: okP.map(f => znome(f.zona)) };
+          }
+        } else {
+          const todos = fl.length ? fl.every(f => up(f.id)) : true;
+          res[e.id] = { status: todos ? "ok" : "falha", fluxosAtivos: todos ? fl.map(f => f.id) : [] };
+          if (!todos) anteriorOk = false;
+        }
+      });
+
+      const falhou = estagios.find(e => res[e.id].status === "falha");
+      const alter = estagios.filter(e => String(res[e.id].status).indexOf("alternativo") === 0);
+      const degr = estagios.filter(e => String(res[e.id].status).indexOf("degradado") > 0);
+
+      let nivel, titulo, tag;
+      if (falhou) {
+        nivel = "fail";
+        titulo = "interrompe em " + falhou.nome.toLowerCase();
+        tag = falhou.falha || "";
+      } else if (alter.length || degr.length) {
+        nivel = "deg";
+        const e = alter[0] || degr[0];
+        titulo = alter.length ? "opera por caminho alternativo" : "opera degradado";
+        tag = e.nome.toLowerCase() + (res[e.id].caminho ? " · " + res[e.id].caminho : "");
+      } else {
+        nivel = "ok";
+        titulo = "íntegro";
+        const d = res["dados"];
+        tag = d && d.caminho ? d.caminho : "todos os estágios no caminho principal";
+      }
+
+      // fatores de degradação que pesam sobre os fluxos em uso. O nível não muda:
+      // somar fatores é sinal de risco, não veredito.
+      const fatores = [];
+      estagios.forEach(e => (res[e.id].fluxosAtivos || []).forEach(fid =>
+        (degrada[fid] || []).forEach(d => { if (fatores.indexOf(d.refId) < 0) fatores.push(d.refId); })));
+      const comp = ENV.degradacao_composta;
+      const composta = !!(comp && nivel === "deg" && fatores.length >= comp.limite);
+      if (composta) titulo += " · " + fatores.length + " fatores somados";
+
+      return { id: p.id, nome: p.nome, detalhe: p.detalhe, estagios, res, nivel, titulo, tag, fatores, composta };
+    }
+
+    // ---- extensão hipotética: componentes, fluxos e condições propostos pela
+    // tradução da IA. A IA declara só a estrutura; o desfecho continua vindo do
+    // motor. Só acrescenta, nunca altera o que foi revisado.
+    //   nós       componente novo numa zona existente
+    //   fluxos    ligação nova entre nós (existentes ou novos), num estágio existente.
+    //             Na mesma preferência de um grupo, vira dependência a mais do caminho;
+    //             numa preferência nova, vira caminho alternativo.
+    //   condições bloqueiam ou degradam fluxos (existentes ou novos)
+    const EXT_MAX = 5;
+    function validarExtensao(ext) {
+      const aceitas = { nos: [], fluxos: [], condicoes: [] }, descartadas = [];
+      const norm = x => String(x || "").trim().toLowerCase();
+      const acha = (lista, v) => lista.find(o => norm(o.id) === norm(v) || norm(o.nome) === norm(v));
+      const idOk = id => typeof id === "string" && /^hip-[a-z0-9-]+$/.test(id);
+      const todos = () => ENV.nos.concat(aceitas.nos).map(n => n.id)
+        .concat(ENV.fluxos.map(f => f.id), aceitas.fluxos.map(f => f.id))
+        .concat((ENV.condicoes || []).map(c => c.id), aceitas.condicoes.map(c => c.id));
+      const texto = x => (x == null ? "" : String(x)).trim();
+      const conf = c => ["alta", "media", "baixa"].indexOf(c) >= 0 ? c : "baixa";
+
+      function cada(tipo, valida) {
+        const lista = (ext && Array.isArray(ext[tipo])) ? ext[tipo] : [];
+        lista.forEach((c, i) => {
+          const rot = (c && c.id) || (tipo + " #" + (i + 1));
+          // orig: o item como veio, para a autocorreção saber o que substituir
+          const motivo = m => { descartadas.push({ id: rot, tipo, motivo: m, orig: c }); };
+          if (!c || typeof c !== "object") return motivo("não é um objeto");
+          if (!idOk(c.id)) return motivo("id precisa começar com 'hip-' e usar só a-z, 0-9 e hífen");
+          if (todos().indexOf(c.id) >= 0) return motivo("id repetido");
+          if (aceitas[tipo].length >= EXT_MAX) return motivo("limite de " + EXT_MAX + " por pergunta");
+          if (!texto(c.nome)) return motivo("sem nome");
+          if (!texto(c.justificativa)) return motivo("sem justificativa");
+          const z = acha(ENV.zonas, c.zona);
+          if (!z) return motivo("zona inexistente: " + c.zona + " (válidas: " + ENV.zonas.map(z => z.id).join(", ") + ")");
+          const r = valida(c, z, motivo);
+          if (!r) return;
+          aceitas[tipo].push(Object.assign(r, {
+            id: c.id, nome: texto(c.nome), zona: z.id, hipotese: true,
+            justificativa: texto(c.justificativa), confianca: conf(c.confianca)
+          }));
+        });
+      }
+
+      cada("nos", () => ({ detalhe: "hipótese", disponibilidade: true }));
+
+      cada("fluxos", (c, z, motivo) => {
+        const nos = ENV.nos.concat(aceitas.nos);
+        const de = acha(nos, c.de), para = acha(nos, c.para);
+        if (!de) return motivo("nó de origem inexistente: " + c.de);
+        if (!para) return motivo("nó de destino inexistente: " + c.para);
+        if (de.id === para.id) return motivo("origem e destino iguais");
+        const e = acha(ENV.estagios, c.estagio);
+        if (!e) return motivo("estágio inexistente: " + c.estagio + " (válidos: " + ENV.estagios.map(e => e.id).join(", ") + ")");
+        const proto = String(c.proto || "").toUpperCase();
+        if (["TCP", "UDP", "LOCAL"].indexOf(proto) < 0) return motivo("protocolo precisa ser TCP, UDP ou LOCAL");
+        const porta = proto === "LOCAL" ? 0 : Number(c.porta);
+        if (!Number.isInteger(porta) || porta < (proto === "LOCAL" ? 0 : 1) || porta > 65535) return motivo("porta inválida: " + c.porta);
+        const papel = ["principal", "fallback", "alternativo"].indexOf(c.papel) >= 0 ? c.papel : "principal";
+        const pref = c.preferencia == null ? (papel === "principal" ? 1 : 2) : Number(c.preferencia);
+        if (!Number.isInteger(pref) || pref < 1 || pref > 9) return motivo("preferência precisa ser inteiro de 1 a 9");
+        const r = {
+          de: de.id, para: para.id, proto, porta, destino: texto(c.destino) || para.nome,
+          estagio: e.id, papel, preferencia: pref, padrao: true
+        };
+        if (texto(c.caminho)) r.caminho = texto(c.caminho);
+        return r;
+      });
+
+      // nó novo sem nenhum fluxo novo não muda nada no motor: seria hipótese decorativa
+      aceitas.nos = aceitas.nos.filter(n => {
+        const usado = aceitas.fluxos.some(f => f.de === n.id || f.para === n.id);
+        if (!usado) descartadas.push({ id: n.id, tipo: "nos", motivo: "nenhum fluxo novo liga este componente",
+          orig: ((ext && ext.nos) || []).find(x => x && x.id === n.id) });
+        return usado;
+      });
+
+      cada("condicoes", (c, z, motivo) => {
+        const fluxos = ENV.fluxos.concat(aceitas.fluxos).map(f => f.id);
+        const bl = Array.isArray(c.bloqueia) ? c.bloqueia : [], dg = Array.isArray(c.degrada) ? c.degrada : [];
+        if (!bl.length && !dg.length) return motivo("não bloqueia nem degrada nenhum fluxo");
+        const fora = bl.concat(dg).filter(f => fluxos.indexOf(f) < 0);
+        if (fora.length) return motivo("fluxo inexistente: " + fora.join(", "));
+        const ambos = bl.filter(f => dg.indexOf(f) >= 0);
+        if (ambos.length) return motivo("o mesmo fluxo não pode ser bloqueado e degradado: " + ambos.join(", "));
+        return {
+          detalhe: "hipótese da tradução, fora da topologia revisada",
+          bloqueia: bl.slice(), degrada: dg.slice(), efeito: "instavel",
+          fonte: "hipótese da IA — " + texto(c.justificativa)
+        };
+      });
+
+      return { aceitas, descartadas };
+    }
+    function aplicarExtensao(aceitas) {
+      ENV.nos = ENV.nos.concat(aceitas.nos);
+      ENV.fluxos = ENV.fluxos.concat(aceitas.fluxos);
+      ENV.condicoes = (ENV.condicoes || []).concat(aceitas.condicoes);
+      aceitas.nos.forEach(n => S.nos[n.id] = true);
+      aceitas.fluxos.forEach(f => S.fluxos[f.id] = true);
+      aceitas.condicoes.forEach(c => S.condicoes[c.id] = false);
+    }
+    function hipoteses() {
+      return {
+        nos: ENV.nos.filter(n => n.hipotese),
+        fluxos: ENV.fluxos.filter(f => f.hipotese),
+        condicoes: (ENV.condicoes || []).filter(c => c.hipotese)
+      };
+    }
+    function removerHipoteses() {
+      const h = hipoteses();
+      h.nos.forEach(n => delete S.nos[n.id]);
+      h.fluxos.forEach(f => delete S.fluxos[f.id]);
+      h.condicoes.forEach(c => delete S.condicoes[c.id]);
+      ENV.nos = ENV.nos.filter(n => !n.hipotese);
+      ENV.fluxos = ENV.fluxos.filter(f => !f.hipotese);
+      ENV.condicoes = (ENV.condicoes || []).filter(c => !c.hipotese);
+    }
+    // roda fn sobre a topologia revisada, como se as hipóteses não existissem
+    function semHipoteses(fn) {
+      const bk = { nos: ENV.nos, fluxos: ENV.fluxos, condicoes: ENV.condicoes };
+      ENV.nos = bk.nos.filter(n => !n.hipotese);
+      ENV.fluxos = bk.fluxos.filter(f => !f.hipotese);
+      ENV.condicoes = (bk.condicoes || []).filter(c => !c.hipotese);
+      try { return fn(); } finally { Object.assign(ENV, bk); }
+    }
+
+    function eventosPossiveis() {
+      const evs = [];
+      ENV.fluxos.forEach(f => evs.push({
+        id: "f:" + f.id, grupo: "fluxos", ref: f.id, zona: f.zona,
+        rotulo: f.proto + " " + f.porta + " → " + f.destino, contexto: "regra bloqueada em " + znome(f.zona)
+      }));
+      (ENV.condicoes || []).forEach(c => evs.push({
+        id: "c:" + c.id, grupo: "condicoes", ref: c.id, zona: c.zona, rotulo: c.nome, contexto: c.detalhe || ""
+      }));
+      ENV.nos.filter(n => n.id in S.nos).forEach(n => evs.push({
+        id: "n:" + n.id, grupo: "nos", ref: n.id, zona: n.zona, rotulo: n.nome, contexto: "componente indisponível"
+      }));
+      return evs;
+    }
+    function jaAtivo(e) {
+      if (e.grupo === "fluxos") return S.fluxos[e.ref] === false;
+      if (e.grupo === "condicoes") return S.condicoes[e.ref] === true;
+      return S.nos[e.ref] === false;
+    }
+    function aplicarEvento(e) {
+      if (e.grupo === "fluxos") S.fluxos[e.ref] = false;
+      else if (e.grupo === "condicoes") S.condicoes[e.ref] = true;
+      else S.nos[e.ref] = false;
+    }
+
+
+
+
+    function calcularVarredura(profundidade) {
+      const base = JSON.parse(JSON.stringify(S));
+      const evs = eventosPossiveis().filter(e => !jaAtivo(e));
+      const combos = [];
+      evs.forEach((e, i) => {
+        combos.push([e]);
+        if (profundidade >= 2) for (let j = i + 1; j < evs.length; j++) combos.push([e, evs[j]]);
+      });
+
+      const out = [];
+      combos.forEach(cb => {
+        ["fluxos", "condicoes", "nos", "sem_efeito"].forEach(g => S[g] = JSON.parse(JSON.stringify(base[g])));
+        cb.forEach(aplicarEvento);
+        const v = avaliar();
+        const ordem = { ok: 0, deg: 1, fail: 2 };
+        let pior = "ok", afeta = [];
+        v.perfis.forEach(p => {
+          if (ordem[p.nivel] > ordem[pior]) pior = p.nivel;
+          if (p.nivel !== "ok") afeta.push(p.nome);
+        });
+        out.push({
+          eventos: cb, nivel: pior, afeta: afeta,
+          porPerfil: v.perfis.map(p => ({ nome: p.nome, nivel: p.nivel, titulo: p.titulo }))
+        });
+      });
+      ["fluxos", "condicoes", "nos", "sem_efeito"].forEach(g => S[g] = base[g]);
+
+      // emergente: a dupla é pior, em algum perfil, do que cada evento sozinho.
+      // É o que a varredura de um evento não mostra.
+      const ordem = { ok: 0, deg: 1, fail: 2 };
+      const sozinho = {};
+      out.filter(x => x.eventos.length === 1).forEach(x => {
+        sozinho[x.eventos[0].id] = {};
+        x.porPerfil.forEach(p => sozinho[x.eventos[0].id][p.nome] = ordem[p.nivel]);
+      });
+      out.filter(x => x.eventos.length === 2).forEach(x => {
+        const [a, b] = x.eventos.map(e => sozinho[e.id]);
+        x.emergente = x.porPerfil.some(p => ordem[p.nivel] > Math.max(a[p.nome], b[p.nome]));
+      });
+
+      return { profundidade, base: baseRotulo(), total: combos.length, itens: out };
+    }
+    function baseRotulo() { return (typeof OBS !== "undefined" && OBS) ? "medido" : "saudável"; }
+
+    /* ===== MOTOR:FIM ===== */
+
+    let SWEEP = null;
+
+    /* zera tudo que foi derivado do ambiente anterior: medição, análise, varredura e cenários */
+    function limparDerivados() {
+      SWEEP = null; OBS = null; ANALISE.texto = null;
+      PERGUNTA.texto = null; PERGUNTA.alteracoes = []; PERGUNTA.fora = []; PERGUNTA.antes = null;
+      document.getElementById("pergOut").innerHTML = "";
+      document.getElementById("pergTag").innerHTML = "";
+      document.getElementById("pergunta").value = "";
+      document.getElementById("btnPergUndo").classList.add("hidden");
+      document.getElementById("sweepTag").textContent = "";
+      document.getElementById("sweep").innerHTML =
+        '<div class="vazio">O painel responde à falha que você marca. A varredura faz o inverso: testa todas as combinações contra o motor e mostra o que derruba, o que degrada sem dar erro e o que não muda nada.</div>';
+      document.getElementById("obsSrc").textContent = "nenhum estado observado. O painel está em simulação pura.";
+      document.getElementById("scnSrc").textContent = "nenhum cenário carregado.";
+      document.getElementById("scnExportBox").classList.add("hidden");
+      document.getElementById("scnExport").value = "";
+      document.getElementById("aiSrc").textContent = "a chave não é gravada em lugar nenhum e some ao fechar a aba.";
+      document.getElementById("evTag").textContent = "";
+      renderAnalise();
+    }
+
+
+    /* ======================= LAYOUT + SVG ======================= */
+    function montarSvg(v) {
+      const W = 1000, faixa = [{ y: 50, h: 190 }, { y: 450, h: 150 }];
+      const topo = ENV.zonas.filter(z => z.tipo !== "fornecedor");
+      const base = ENV.zonas.filter(z => z.tipo === "fornecedor");
+      const geo = {}, nodeGeo = {};
+
+      function distribuir(zonas, f) {
+        const n = zonas.length, gap = 40, larg = (920 - gap * (n - 1)) / n;
+        zonas.forEach((z, i) => geo[z.id] = { x: 40 + i * (larg + gap), y: f.y, w: larg, h: f.h });
+      }
+      distribuir(topo, faixa[0]); distribuir(base, faixa[1]);
+
+      ENV.zonas.forEach(z => {
+        const g = geo[z.id], ns = ENV.nos.filter(n => n.zona === z.id);
+        const hN = 56;
+        let gapN = 26;
+        let larguras = ns.map(n => Math.max(112, Math.max(n.nome.length, (n.detalhe || "").length * 0.86) * 7.6 + 30));
+        const soma = () => larguras.reduce((a, b) => a + b, 0) + gapN * (ns.length - 1);
+        // componente a mais (uma hipótese, por exemplo) não pode empurrar os outros para fora da zona:
+        // aperta o espaço e encolhe caixas e texto na mesma proporção
+        const util = g.w - 24;
+        let escala = 1;
+        if (soma() > util) {
+          gapN = 14;
+          escala = (util - gapN * (ns.length - 1)) / larguras.reduce((a, b) => a + b, 0);
+          larguras = larguras.map(w => w * escala);
+        }
+        const total = soma();
+        let x = g.x + (g.w - total) / 2;
+        const y = g.y + (g.h - hN) / 2 + 12;
+        ns.forEach((n, i) => { nodeGeo[n.id] = { x, y, w: larguras[i], h: hN, escala }; x += larguras[i] + gapN; });
+      });
+
+      const porOrigem = {}, porDestino = {};
+      ENV.fluxos.forEach(f => {
+        (porOrigem[f.de] = porOrigem[f.de] || []).push(f.id);
+        (porDestino[f.para] = porDestino[f.para] || []).push(f.id);
+      });
+      function ponto(nid, fid, mapa, topoBorda) {
+        const g = nodeGeo[nid], lista = mapa[nid], i = lista.indexOf(fid), n = lista.length;
+        const span = Math.min(g.w - 24, (n - 1) * 18);
+        const x = g.x + g.w / 2 - span / 2 + (n > 1 ? i * (span / (n - 1)) : 0);
+        return { x, y: topoBorda ? g.y : g.y + g.h };
+      }
+
+      let s = '<svg viewBox="0 0 ' + W + ' 640" xmlns="http://www.w3.org/2000/svg">';
+      const corVar = { amber: "var(--amber)", blue: "var(--blue)", violet: "var(--violet)" };
+
+      ENV.zonas.forEach(z => {
+        const g = geo[z.id];
+        s += '<rect class="zone-box" x="' + g.x + '" y="' + g.y + '" width="' + g.w + '" height="' + g.h + '" rx="3"/>';
+        s += '<text class="zone-lbl" x="' + (g.x + 16) + '" y="' + (g.y + 24) + '" fill="' + (corVar[z.cor] || "var(--amber)") + '">' + z.nome + '</text>';
+        if (z.detalhe) s += '<text class="zone-sub" x="' + (g.x + 16) + '" y="' + (g.y + 40) + '">' + z.detalhe + '</text>';
+      });
+
+      ENV.fluxos.forEach(f => {
+        const g1 = nodeGeo[f.de], g2 = nodeGeo[f.para];
+        let d;
+        if (Math.abs(g1.y - g2.y) < 4) {
+          // mesma faixa: arco lateral, sem sair da área do desenho
+          const paraDireita = g2.x > g1.x;
+          const ax = paraDireita ? g1.x + g1.w : g1.x;
+          const bx = paraDireita ? g2.x : g2.x + g2.w;
+          const ay = g1.y + g1.h / 2, by = g2.y + g2.h / 2;
+          const dx = Math.max(40, Math.abs(bx - ax) * 0.45) * (paraDireita ? 1 : -1);
+          const arco = 34;
+          d = 'M ' + ax + ' ' + ay + ' C ' + (ax + dx) + ' ' + (ay - arco) + ', ' + (bx - dx) + ' ' + (by - arco) + ', ' + bx + ' ' + by;
+        } else {
+          const desce = g2.y > g1.y;
+          const a = ponto(f.de, f.id, porOrigem, !desce);
+          const b = ponto(f.para, f.id, porDestino, desce);
+          const c = desce ? 150 : -150;
+          d = 'M ' + a.x + ' ' + a.y + ' C ' + a.x + ' ' + (a.y + c) + ', ' + b.x + ' ' + (b.y - c) + ', ' + b.x + ' ' + b.y;
+        }
+        s += '<path id="p-' + f.id + '" class="edge ' + v.cls[f.id] + '" d="' + d + '"/>';
+      });
+
+      ENV.nos.forEach(n => {
+        const g = nodeGeo[n.id], z = ENV.zonas.find(x => x.id === n.zona);
+        const down = (n.id in S.nos) && !S.nos[n.id];
+        const stroke = down ? "var(--red)" : n.hipotese ? "var(--violet)" : (corVar[z.cor] || "var(--blue)");
+        s += '<rect x="' + g.x + '" y="' + g.y + '" width="' + g.w + '" height="' + g.h + '" rx="3" fill="var(--panel)" stroke="' + stroke + '" stroke-width="1.4"' +
+          (n.hipotese ? ' stroke-dasharray="5 4"' : '') + ' opacity="' + (down ? 0.55 : 1) + '"/>';
+        const fs = (px) => g.escala < 1 ? ' style="font-size:' + (px * g.escala).toFixed(1) + 'px"' : '';
+        s += '<text class="node-lbl" x="' + (g.x + g.w / 2) + '" y="' + (g.y + 25) + '"' + fs(13) + '>' + n.nome + '</text>';
+        if (n.detalhe) s += '<text class="node-sub" x="' + (g.x + g.w / 2) + '" y="' + (g.y + 42) + '"' + fs(9.5) + '>' + n.detalhe + '</text>';
+      });
+
+      s += '<g id="edgeLabels"></g><g id="xmarks"></g>';
+      s += '<g transform="translate(40,624)">' +
+        '<line x1="0" y1="-4" x2="26" y2="-4" stroke="var(--green)" stroke-width="2"/><text class="lgd" x="34" y="0">em uso</text>' +
+        '<line x1="110" y1="-4" x2="136" y2="-4" stroke="var(--amber)" stroke-width="2" stroke-dasharray="7 4"/><text class="lgd" x="144" y="0">em uso · degradado</text>' +
+        '<line x1="300" y1="-4" x2="326" y2="-4" stroke="var(--dim)" stroke-width="2" stroke-dasharray="2 5"/><text class="lgd" x="334" y="0">liberado · ocioso</text>' +
+        '<line x1="470" y1="-4" x2="496" y2="-4" stroke="var(--red)" stroke-width="2" stroke-dasharray="5 5"/><text class="lgd" x="504" y="0">bloqueado</text>' +
+        '<line x1="612" y1="-4" x2="638" y2="-4" stroke="#d6d3cc" stroke-width="2" stroke-dasharray="2 6"/><text class="lgd" x="646" y="0">não chega a ser usado</text>' +
+        '</g></svg>';
+
+      document.getElementById("svgHost").innerHTML = s;
+
+      // rótulos e X posicionados sobre as curvas já renderizadas
+      const gl = document.getElementById("edgeLabels"), gx = document.getElementById("xmarks");
+      let li = "", xi = "";
+      ENV.fluxos.forEach((f, idx) => {
+        const p = document.getElementById("p-" + f.id), L = p.getTotalLength();
+        const t = 0.40 + (idx % 3) * 0.10;
+        const pt = p.getPointAtLength(L * t);
+        const cor = v.cls[f.id] === "ok" ? "var(--green)" : v.cls[f.id] === "deg" ? "var(--amber)" : v.cls[f.id] === "blocked" ? "var(--red)" : "var(--dim)";
+        const papel = f.hipotese ? "hipótese"
+          : f.papel === "fallback" ? "fallback"
+          : f.papel === "alternativo" ? "alternativo"
+            : (f.proto === "UDP" ? "EDT · principal" : "principal");
+        li += '<rect x="' + (pt.x - 38) + '" y="' + (pt.y - 12) + '" width="76" height="26" rx="2" fill="var(--bg)" opacity=".93"/>' +
+          '<text class="elbl" x="' + pt.x + '" y="' + (pt.y - 2) + '" fill="' + cor + '">' + (f.proto === "LOCAL" ? "local" : f.proto + ' ' + f.porta) + '</text>' +
+          '<text class="elbl" x="' + pt.x + '" y="' + (pt.y + 9) + '" fill="' + (f.hipotese ? "var(--violet)" : "var(--dim)") + '">' + papel + '</text>';
+        if (v.cls[f.id] === "blocked") {
+          const q = p.getPointAtLength(L * 0.70), d = 7;
+          xi += '<line class="xmark" x1="' + (q.x - d) + '" y1="' + (q.y - d) + '" x2="' + (q.x + d) + '" y2="' + (q.y + d) + '"/>' +
+            '<line class="xmark" x1="' + (q.x + d) + '" y1="' + (q.y - d) + '" x2="' + (q.x - d) + '" y2="' + (q.y + d) + '"/>';
+        }
+      });
+      gl.innerHTML = li; gx.innerHTML = xi;
+    }
+
+    /* ======================= UI ======================= */
+    function el(t, c, h) { const n = document.createElement(t); if (c) n.className = c; if (h !== undefined) n.innerHTML = h; return n; }
+
+    function toggle(grupo, id, titulo, detalhe, perigoso, medido) {
+      const lab = el("label", "tog" + (perigoso ? " danger" : ""));
+      const inp = document.createElement("input"); inp.type = "checkbox"; inp.checked = !!S[grupo][id];
+      inp.addEventListener("change", () => { S[grupo][id] = inp.checked; cenarioAtivo = null; if (typeof limparAnalise === "function") limparAnalise(); render(); });
+      lab.appendChild(inp); lab.appendChild(el("span", "sw"));
+      let sufixo = "";
+      if (medido === "igual") sufixo = '<span class="meas">medido</span>';
+      if (medido === "diverge") sufixo = '<span class="meas div">hipótese</span>';
+      lab.appendChild(el("span", "txt", titulo + sufixo + "<em>" + detalhe + "</em>"));
+      return lab;
+    }
+
+    function montarControles() {
+      if (!ENV) return;
+      const div = divergeDoObservado();
+      const host = document.getElementById("flowGroups"); host.innerHTML = "";
+      ENV.zonas.forEach(z => {
+        const fl = ENV.fluxos.filter(f => f.zona === z.id);
+        const sem = (ENV.regras_sem_efeito || []).filter(r => r.zona === z.id);
+        if (!fl.length && !sem.length) return;
+        const sec = el("div", "sec");
+        sec.appendChild(el("p", "sec-title", '<span>Regras de saída — <span class="zone-tag ' + zcls(z.id) + '">' + z.nome + '</span></span>'));
+        fl.forEach(f => {
+          let m = null;
+          if (OBS && OBS.fluxos && OBS.fluxos[f.id]) m = div.indexOf(f.id) >= 0 ? "diverge" : "igual";
+          sec.appendChild(toggle("fluxos", f.id, (f.hipotese ? "hipótese · " : "") + f.proto + " " + f.porta + " saída → " + f.destino, f.nome, false, m));
+        });
+        sem.forEach(r => sec.appendChild(toggle("sem_efeito", r.id, r.nome, r.detalhe, true)));
+        host.appendChild(sec);
+      });
+
+      const cd = document.getElementById("conds"); cd.innerHTML = "";
+      (ENV.condicoes || []).forEach(c => cd.appendChild(toggle("condicoes", c.id, (c.hipotese ? "hipótese · " : "") + c.nome, c.detalhe, true)));
+
+      const av = document.getElementById("avail"); av.innerHTML = "";
+      ENV.nos.filter(n => n.id in S.nos).forEach(n =>
+        av.appendChild(toggle("nos", n.id, (n.hipotese ? "hipótese · " : "") + n.nome, n.detalhe || znome(n.zona))));
+
+      const sc = document.getElementById("scn"); sc.innerHTML = "";
+      (ENV.cenarios || []).forEach(c => {
+        const b = document.createElement("button"); b.dataset.id = c.id;
+        b.innerHTML = c.nome + "<small>" + c.detalhe + "</small>";
+        b.addEventListener("click", () => {
+          resetEstado(); aplicarObservado();
+          const a = c.aplica || {};
+          ["fluxos", "condicoes", "nos", "sem_efeito"].forEach(g => { if (a[g]) Object.assign(S[g], a[g]); });
+          cenarioAtivo = c.id; if (typeof limparAnalise === "function") limparAnalise(); montarControles(); render();
+        });
+        sc.appendChild(b);
+      });
+    }
+
+    function renderVeredito(v) {
+      const map = { ok: "v-ok", deg: "v-deg", fail: "v-fail" };
+      const stage = (k, val, cor, d) =>
+        '<div class="stage"><div class="k">' + k + '</div><div class="v" style="color:' + cor + '">' + val + '</div><div class="d">' + d + '</div></div>';
+
+      let html = "";
+      v.perfis.forEach(p => {
+        let st = "";
+        p.estagios.forEach(e => {
+          const r = p.res[e.id], k = e.ordem + " · " + e.nome;
+          if (r.status === "nao-avaliado") st += stage(k, "não avaliado", "var(--dim)", "depende do estágio anterior");
+          else if (r.status === "falha") st += stage(k, "falha", "var(--red)", e.falha || "");
+          else if (r.status === "alternativo") st += stage(k, r.caminho || "caminho alternativo", "var(--amber)", "o caminho principal não subiu");
+          else if (r.status === "alternativo-degradado") st += stage(k, (r.caminho || "alternativo") + " · instável", "var(--amber)", "alternativo com degradação");
+          else if (r.status === "principal-degradado") st += stage(k, (r.caminho || "principal") + " · instável", "var(--amber)", "passa, mas não se mantém");
+          else st += stage(k, r.caminho || "ok", "var(--green)", e.ok || "");
+        });
+        const sel = (S.perfil === p.id) ? ' style="outline:1px solid var(--amber);outline-offset:-1px"' : '';
+        html += '<div class="verdict"' + sel + '>' +
+          '<div class="v-bar ' + map[p.nivel] + '"><span class="v-dot"></span>' +
+          '<span class="v-title">' + p.nome + ' · ' + p.titulo + '</span>' +
+          '<span class="v-tag">' + p.tag + '</span></div>' +
+          '<div class="stages" style="grid-template-columns:repeat(' + Math.max(p.estagios.length, 1) + ',1fr)">' + st + '</div></div>';
+      });
+      document.getElementById("verdict").outerHTML = '<div id="verdict">' + html + '</div>';
+    }
+
+    function renderFatos(v) {
+      const rot = {
+        "regra-ausente": "regra ausente no firewall",
+        "condicao": "condição do caminho",
+        "componente-indisponivel": "componente indisponível"
+      };
+      const linhas = []; const seen = new Set();
+      ENV.fluxos.forEach(f => (v.bloqueios[f.id] || []).concat(v.degrada[f.id] || []).forEach(b => {
+        const k = b.tipo + "|" + b.alvo + "|" + b.fluxo; if (seen.has(k)) return; seen.add(k);
+        linhas.push(b);
+      }));
+
+      let html = "";
+      if (!linhas.length) {
+        html = '<div class="vazio">Nenhum bloqueio. Todos os estágios passam com o estado atual.</div>';
+      } else {
+        linhas.forEach(b => {
+          const f = ENV.fluxos.find(x => x.id === b.fluxo);
+          html += '<div class="fact"><span class="zone-tag ' + zcls(b.zona) + '">' + znome(b.zona) + '</span>' +
+            '<div><div><code>' + (f ? f.id : b.fluxo) + '</code> ' + (b.degradacao ? "degradado" : "bloqueado") + ' · ' + rot[b.tipo] + '</div>' +
+            '<div class="why">' + b.alvo + (f ? '  —  ' + f.proto + ' ' + f.porta + ' → ' + f.destino : '') + '</div></div></div>';
+        });
+      }
+
+      const d = v.res["dados"];
+      if (d && d.assimetria) {
+        html += '<div class="fact"><span class="zone-tag z-amber">assimetria</span><div><div>caminho principal exige as duas pontas</div>' +
+          '<div class="why">falta em ' + d.assimetria.faltando.join(", ") + ' · aberto em ' + d.assimetria.ok.join(", ") + '</div></div></div>';
+      }
+      (ENV.regras_sem_efeito || []).forEach(r => {
+        if (S.sem_efeito[r.id])
+          html += '<div class="fact"><span class="zone-tag ' + zcls(r.zona) + '">sem efeito</span><div><div>' + r.nome +
+            '</div><div class="why">nenhum estágio do modelo depende desta regra</div></div></div>';
+      });
+
+      document.getElementById("facts").innerHTML = html;
+    }
+
+    function renderEvidencia() {
+      const host = document.getElementById("evidence"), tag = document.getElementById("evTag");
+      if (!OBS) {
+        tag.textContent = "";
+        host.innerHTML = '<div class="vazio">Nenhuma medição carregada. Tudo na tela é o modelo respondendo ao que você marcou, não o ambiente real.<br><br>Rode o coletor e carregue o estado-observado.json.</div>';
+        return;
+      }
+      tag.textContent = OBS.coletado_em || "";
+      const L = (k, v, c) => '<div><span class="k">' + k + '</span> <span class="v ' + (c || "") + '">' + v + '</span></div>';
+      let h = L("origem", OBS.origem || "—");
+      if (OBS.dns) Object.keys(OBS.dns).forEach(id => {
+        const d = OBS.dns[id];
+        h += L(id + " dns", (d.ips || []).join(", ") || "—", d.rotacionou ? "warn" : "");
+        if (d.rotacionou) h += L("", "IPs mudaram desde a coleta anterior", "warn");
+      });
+      let dnsRuim = 0;
+      if (OBS.fluxos) Object.keys(OBS.fluxos).forEach(id => {
+        const f = OBS.fluxos[id];
+        const semDns = (f.estado === "nao-resolvido" || f.estado === "sem-registro-a");
+        if (semDns) dnsRuim++;
+        const c = f.estado === "ok" ? "good"
+          : f.estado === "nao-testado" ? ""
+            : semDns ? "warn" : "bad";
+        const alvo = (OBS.alvos && OBS.alvos[id]) ? "  " + OBS.alvos[id] : "";
+        const m = idModelo(id);
+        const rot = !(m in S.fluxos) ? id + " (fora do modelo)" : (m !== id ? id + " → " + m : id);
+        h += L(rot, f.estado + alvo + (f.rtt_ms !== undefined ? "  " + f.rtt_ms + " ms" : "") + (f.erro ? "  (" + f.erro + ")" : ""), c);
+        if (f.acao) h += L("", f.acao, "warn");
+        if (f.aviso) h += L("", f.aviso, "warn");
+        const meds = ((OBS.medicoes || {})[id]) || [];
+        if (meds.length > 1) meds.forEach(m => {
+          const lim = ((ENV.limiares || {}).rtt_ms || {}).aviso;
+          const lento = lim && m.rtt_ms > lim;
+          h += L("", "  " + (m.ponto || "?") + ": " + m.estado +
+            (m.rtt_ms !== undefined ? "  " + m.rtt_ms + " ms" : "") +
+            (m.ip ? "  via " + m.ip : ""), lento ? "warn" : "");
+        });
+      });
+      if (OBS.tls) Object.keys(OBS.tls).forEach(id => {
+        const t = OBS.tls[id];
+        if (t.emissor) h += L(id + " tls", t.emissor, t.inspecao ? "warn" : "good");
+        else if (t.erro) h += L(id + " tls", t.erro, "bad");
+      });
+      if (OBS.sessoes) h += L("sessões", OBS.sessoes.edt + " EDT / " + OBS.sessoes.tcp + " TCP de " + OBS.sessoes.total);
+      if (dnsRuim) h += '<div class="vazio" style="margin-top:10px">' + dnsRuim +
+        ' alvo(s) não chegaram a ser testados: o nome não resolve. Isso é problema do alvo da coleta, ' +
+        'não prova bloqueio de firewall — mas o modelo trata o fluxo como indisponível, então o veredito acima está pessimista.</div>';
+      host.innerHTML = h;
+    }
+
+    function renderFirewall(v) {
+      let html = "<thead><tr><th>zona</th><th>regra</th><th>papel</th><th>estado</th></tr></thead><tbody>";
+      ENV.fluxos.forEach(f => {
+        let pill;
+        if (!S.fluxos[f.id]) pill = '<span class="pill p-dead">ausente</span>';
+        else if (v.bloqueios[f.id].length) pill = '<span class="pill p-dead">liberada, tráfego não passa</span>';
+        else if (v.cls[f.id] === "ok" || v.cls[f.id] === "deg") pill = '<span class="pill p-use">em uso</span>';
+        else pill = '<span class="pill p-idle">ociosa</span>';
+        html += "<tr><td class='na'>" + znome(f.zona) + "</td><td>saída " + f.proto + " " + f.porta + " → " + f.destino +
+          "</td><td class='na'>" + f.nome + "</td><td>" + pill + "</td></tr>";
+      });
+      (ENV.regras_sem_efeito || []).forEach(r => {
+        if (S.sem_efeito[r.id])
+          html += "<tr><td class='na'>" + znome(r.zona) + "</td><td>" + r.nome + "</td><td class='na'>—</td><td><span class='pill p-null'>sem efeito</span></td></tr>";
+      });
+      document.getElementById("fwtable").innerHTML = html + "</tbody>";
+    }
+
+    function renderModo() {
+      const t = document.getElementById("modeTag");
+      if (!OBS) { t.className = "mode sim"; t.textContent = "modo simulação"; return; }
+      const d = divergeDoObservado();
+      if (d.length) { t.className = "mode hip"; t.textContent = "espelho + hipótese · " + d.length + " alterado(s)"; }
+      else { t.className = "mode esp"; t.textContent = "modo espelho · estado medido"; }
+    }
+
+    function renderPerfilSel(v) {
+      const host = document.getElementById("perfilSel");
+      if (v.perfis.length < 2) { host.innerHTML = ""; return; }
+      host.innerHTML = v.perfis.map(p =>
+        '<button class="btn' + (S.perfil === p.id ? "" : " ghost") + '" data-p="' + p.id + '"' +
+        (S.perfil === p.id ? ' style="border-color:var(--amber);color:var(--amber)"' : '') + '>' +
+        p.nome + '</button>').join("");
+      host.querySelectorAll("button").forEach(b => b.onclick = () => {
+        S.perfil = b.dataset.p; render();
+      });
+    }
+
+    function render() {
+      if (!ENV) return;
+      const v = avaliar();
+      renderVeredito(v); montarSvg(v); renderFatos(v); renderEvidencia(); renderFirewall(v); renderModo();
+      const d = v.res["dados"] || {};
+      document.getElementById("transportTag").textContent =
+        d.status ? "perfil " + v.ativo.nome.toLowerCase() + " · " + (d.caminho || d.status) : "";
+      renderPerfilSel(v);
+      document.querySelectorAll("#scn button").forEach(b => b.classList.toggle("on", b.dataset.id === cenarioAtivo));
+    }
+
+    /* ======================= CARGA ======================= */
+    function validar(j) {
+      ["zonas", "nos", "estagios", "fluxos"].forEach(k => { if (!Array.isArray(j[k])) throw new Error("campo '" + k + "' ausente ou inválido"); });
+      const ids = new Set(j.nos.map(n => n.id));
+      j.fluxos.forEach(f => { if (!ids.has(f.de) || !ids.has(f.para)) throw new Error("fluxo '" + f.id + "' aponta para nó inexistente"); });
+      return j;
+    }
+    function carregarEnv(j, origem) {
+      if (typeof limparDerivados === "function") limparDerivados();
+      ENV = validar(j);
+      resetEstado(); cenarioAtivo = "base";
+      montarControles(); render();
+      document.getElementById("envline").textContent =
+        (ENV.ambiente || "ambiente") + " · " + ENV.fluxos.length + " fluxos · " + ENV.nos.length + " componentes";
+      document.getElementById("envSrc").innerHTML =
+        '<span class="good">carregado</span> · fonte: <b>' + origem + '</b><br>schema ' + (ENV.schema || "?");
+    }
+    async function buscar(url) {
+      const r = await fetch(url, { cache: "no-store" });
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.json();
+    }
+    function erro(elId, e) {
+      document.getElementById(elId).innerHTML = '<span class="err">falhou</span> · ' + e.message +
+        '<br>Repositório privado precisa de token e não deve ser lido daqui. Publique o arquivo num endpoint interno.';
+    }
+
+    document.getElementById("btnEnvUrl").onclick = async () => {
+      const u = document.getElementById("envUrl").value.trim(); if (!u) return;
+      try { carregarEnv(await buscar(u), u); } catch (e) { erro("envSrc", e); }
+    };
+    document.getElementById("btnEnvFile").onclick = () => document.getElementById("envFile").click();
+    document.getElementById("envFile").onchange = e => {
+      const f = e.target.files[0]; if (!f) return;
+      const rd = new FileReader();
+      rd.onload = () => { try { carregarEnv(JSON.parse(rd.result), f.name); } catch (x) { erro("envSrc", x); } };
+      rd.readAsText(f);
+    };
+    document.getElementById("tgl-paste").onclick = () => document.getElementById("pasteBox").classList.toggle("hidden");
+    document.getElementById("btnEnvPaste").onclick = () => {
+      try { carregarEnv(JSON.parse(document.getElementById("envPaste").value), "texto colado"); }
+      catch (e) { erro("envSrc", e); }
+    };
+
+    function carregarObs(j, origem) {
+      OBS = j;
+      if (!ENV) { document.getElementById("obsSrc").innerHTML = '<span class="err">estado guardado</span> · carregue a definição do ambiente para aplicá-lo.'; return; }
+      resetEstado(); aplicarObservado(); cenarioAtivo = null;
+      montarControles(); render();
+      const q = j.sessoes ? " · sessões: " + (j.sessoes.edt || 0) + " EDT / " + (j.sessoes.tcp || 0) + " TCP" : "";
+      document.getElementById("obsSrc").innerHTML =
+        '<span class="good">estado medido</span> · ' + (j.coletado_em || "sem carimbo") + '<br>origem: <b>' + (j.origem || origem) + '</b>' + q;
+    }
+    document.getElementById("btnObsUrl").onclick = async () => {
+      const u = document.getElementById("obsUrl").value.trim(); if (!u) return;
+      try { carregarObs(await buscar(u), u); } catch (e) { erro("obsSrc", e); }
+    };
+    document.getElementById("btnObsFile").onclick = () => document.getElementById("obsFile").click();
+    document.getElementById("obsFile").onchange = e => {
+      const f = e.target.files[0]; if (!f) return;
+      const rd = new FileReader();
+      rd.onload = () => { try { carregarObs(JSON.parse(rd.result), f.name); } catch (x) { erro("obsSrc", x); } };
+      rd.readAsText(f);
+    };
+    document.getElementById("btnObsClear").onclick = () => {
+      OBS = null; if (!ENV) { document.getElementById("obsSrc").textContent = "nenhum estado observado."; return; }
+      resetEstado(); cenarioAtivo = "base"; montarControles(); render();
+      document.getElementById("obsSrc").textContent = "nenhum estado observado. O painel está em simulação pura.";
+    };
+
+    /* ======================= BOOT ======================= */
+    function vazio() {
+      ENV = null; OBS = null; cenarioAtivo = null;
+      ["flowGroups", "conds", "avail", "scn", "facts", "svgHost", "fwtable"].forEach(id => {
+        const n = document.getElementById(id); if (n) n.innerHTML = "";
+      });
+      document.getElementById("envline").textContent = "nenhum ambiente carregado";
+      document.getElementById("envSrc").innerHTML = "aguardando definição. Carregue por URL, arquivo local ou texto colado.";
+      renderEvidencia(); limparAnalise(); SWEEP = null;
+      document.getElementById("sweepTag").textContent = "";
+      document.getElementById("transportTag").textContent = "";
+      const t = document.getElementById("modeTag"); t.className = "mode sim"; t.textContent = "sem ambiente";
+      document.getElementById("verdict").innerHTML = '<div class="verdict">' +
+        '<div class="v-bar" style="background:rgba(120,137,154,.06)">' +
+        '<span class="v-dot" style="background:var(--dim)"></span>' +
+        '<span class="v-title" style="color:var(--mute)">Nenhum ambiente carregado</span></div>' +
+        '<div class="stages" style="grid-template-columns:1fr"><div class="stage">' +
+        '<div class="k">como começar</div>' +
+        '<div class="d" style="margin-top:6px">O painel não traz modelo próprio. ' +
+        'Aponte a URL do seu <code>ambiente.json</code>, escolha um arquivo local ou cole o conteúdo ' +
+        'no campo ao lado. O motor é construído a partir do que você carregar: zonas, componentes, ' +
+        'fluxos, estágios, condições e cenários.</div></div></div></div>';
+    }
+
+    /* ======================= ANÁLISE POR IA ======================= */
+    let AI_KEY = "";
+    const ANALISE = { texto: null, modelo: null, base: null, em: null };
+
+    document.getElementById("aiKey").addEventListener("input", e => { AI_KEY = e.target.value.trim(); });
+    document.getElementById("aiClear").onclick = () => {
+      AI_KEY = ""; document.getElementById("aiKey").value = "";
+      document.getElementById("aiSrc").textContent = "chave apagada da memória desta aba.";
+    };
+
+    function contextoParaIA(v) {
+      const fatos = [];
+      ENV.fluxos.forEach(f => (v.bloqueios[f.id] || []).forEach(b =>
+        fatos.push({ fluxo: f.id, efeito: "bloqueado", tipo: b.tipo, alvo: b.alvo, zona: znome(b.zona) })));
+      ENV.fluxos.forEach(f => (v.degrada[f.id] || []).forEach(b =>
+        fatos.push({ fluxo: f.id, efeito: "degradado", tipo: b.tipo, alvo: b.alvo, zona: znome(b.zona) })));
+
+      const estagios = {};
+      v.ativo.estagios.forEach(e => estagios[e.id] = { status: v.ativo.res[e.id].status, ativos: v.ativo.res[e.id].fluxosAtivos });
+
+      return {
+        ambiente: ENV.ambiente,
+        veredito_do_motor: v.perfis.map(p => ({
+          perfil: p.nome, nivel: p.nivel, titulo: p.titulo, resumo: p.tag,
+          estagios: p.estagios.map(e => ({ nome: e.nome, status: p.res[e.id].status, caminho: p.res[e.id].caminho || null }))
+        })),
+        premissas_do_modelo: ENV.premissas || null,
+        estagios: estagios,
+        assimetria: (v.res["dados"] || {}).assimetria || null,
+        topologia: ENV.fluxos.map(f => ({
+          id: f.id, nome: f.nome, proto: f.proto, porta: f.porta, destino: f.destino,
+          zona: znome(f.zona), estagio: f.estagio, papel: f.papel,
+          regra_liberada: !!S.fluxos[f.id], hipotese: !!f.hipotese
+        })),
+        zonas: ENV.zonas.map(z => ({ nome: z.nome, tipo: z.tipo })),
+        condicoes_marcadas: Object.keys(S.condicoes).filter(k => S.condicoes[k]),
+        hipoteses_da_traducao: (h => ({
+          componentes: h.nos.map(n => ({ id: n.id, nome: n.nome, zona: n.zona, justificativa: n.justificativa, confianca: n.confianca })),
+          fluxos: h.fluxos.map(f => ({ id: f.id, nome: f.nome, de: f.de, para: f.para, proto: f.proto, porta: f.porta,
+            estagio: f.estagio, preferencia: f.preferencia, justificativa: f.justificativa, confianca: f.confianca })),
+          condicoes: h.condicoes.filter(c => S.condicoes[c.id]).map(c => ({ id: c.id, nome: c.nome, bloqueia: c.bloqueia,
+            degrada: c.degrada, justificativa: c.justificativa, confianca: c.confianca }))
+        }))(hipoteses()),
+        componentes_fora: Object.keys(S.nos).filter(k => !S.nos[k]),
+        regras_sem_efeito_marcadas: Object.keys(S.sem_efeito).filter(k => S.sem_efeito[k]),
+        fatos: fatos,
+        medicao: OBS || null,
+        divergencia_do_medido: divergeDoObservado()
+      };
+    }
+
+    const PROMPT_SISTEMA = [
+      "Você analisa o estado de um caminho de rede Citrix Rendezvous V2 com EDT, a partir de um modelo executável.",
+      "",
+      "Regras que você não pode violar:",
+      "1. O veredito do motor é autoridade. Nunca contradiga 'veredito_do_motor' nem o status dos estágios. Você explica, não julga se funciona.",
+      "1b. O motor avalia perfis de ciclo de vida separados (por exemplo sessão nova e sessão em andamento). Trate cada perfil pelo seu próprio veredito: um pode estar interrompido enquanto o outro segue íntegro, e isso não é contradição.",
+      "2. Não invente dado. Se um número, IP, emissor de certificado ou contagem não estiver no contexto, não cite.",
+      "3. Distinga medição de hipótese. O campo 'medicao' é o que foi medido de verdade por um coletor. Tudo fora dele é estado marcado à mão. Cada causa precisa dizer em que se apoia.",
+      "4. Se 'medicao' for null, toda a análise é hipótese sobre um cenário montado, e você deve dizer isso na primeira frase.",
+      "5. Se 'divergencia_do_medido' tiver itens, esses fluxos foram alterados manualmente por cima da medição: trate como simulação, não como realidade.",
+      "6. Escreva em português do Brasil, direto, sem jargão de consultoria e sem floreio.",
+      "7. Se houver 'pergunta_do_usuario', responda a ela em 'leitura'. A mudança descrita já foi aplicada ao modelo e o veredito recebido é o resultado dela. Se a pergunta mencionava algo que o modelo não representa, diga isso em 'ressalva'.",
+      "8. Componentes, fluxos e condições em 'hipoteses_da_traducao' NÃO fazem parte da topologia revisada: foram criadas a partir da pergunta, com efeito declarado por suposição. Diga na 'leitura' que o veredito depende delas, nunca as cite como evidência de causa, e ponha em 'verificacoes' o que confirmaria que a hipótese vale de fato.",
+      "",
+      "Responda SOMENTE com um objeto JSON, sem markdown e sem texto em volta, neste formato:",
+      '{"leitura":"2 a 4 frases sobre o que está acontecendo","causas":[{"zona":"","causa":"","evidencia":"em que dado do contexto isso se apoia","confianca":"alta|media|baixa","acao":"o que fazer, ou quem acionar"}],"sintoma":"o que o usuário percebe e o que aparece no chamado","verificacoes":["o que medir para confirmar"],"ressalva":"o que você não pôde determinar com o que recebeu"}'
+    ].join("\n");
+
+    async function analisar(pergunta) {
+      if (!ENV) { document.getElementById("aiSrc").innerHTML = '<span class="err">carregue um ambiente primeiro.</span>'; return; }
+      const modelo = document.getElementById("aiModel").value.trim();
+      if (!AI_KEY || !modelo) {
+        document.getElementById("aiSrc").innerHTML = '<span class="err">informe a chave e o modelo.</span>';
+        return;
+      }
+      const v = avaliar();
+      const ctx = contextoParaIA(v);
+      if (pergunta) ctx.pergunta_do_usuario = pergunta;
+      const btn = document.getElementById("btnAi");
+      btn.disabled = true; btn.textContent = "analisando…";
+      document.getElementById("analysis").innerHTML = '<div class="vazio">consultando o modelo…</div>';
+
+      try {
+        const r = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+          method: "POST",
+          headers: { "Authorization": "Bearer " + AI_KEY, "Content-Type": "application/json", "X-Title": "gemeo-citrix" },
+          body: JSON.stringify({
+            model: modelo,
+            temperature: 0.2,
+            messages: [
+              { role: "system", content: PROMPT_SISTEMA },
+              { role: "user", content: JSON.stringify(ctx) }
+            ]
+          })
+        });
+        if (!r.ok) throw new Error("HTTP " + r.status + " · " + (await r.text()).slice(0, 180));
+        const data = await r.json();
+        let txt = (((data.choices || [])[0] || {}).message || {}).content || "";
+        txt = txt.replace(/```json|```/g, "").trim();
+        const out = JSON.parse(txt);
+        ANALISE.texto = out; ANALISE.modelo = modelo;
+        const hip = ctx.hipoteses_da_traducao;
+        const comHipotese = hip.componentes.length || hip.fluxos.length || hip.condicoes.length;
+        ANALISE.base = OBS ? ((ctx.divergencia_do_medido.length || comHipotese) ? "hipótese sobre medição" : "medição") : "simulação";
+        ANALISE.em = new Date().toLocaleString("pt-BR");
+        renderAnalise();
+        document.getElementById("aiSrc").innerHTML = '<span class="good">análise concluída</span> · ' + modelo;
+      } catch (e) {
+        document.getElementById("analysis").innerHTML =
+          '<div class="vazio">A chamada falhou: ' + e.message + '</div>';
+        document.getElementById("aiSrc").innerHTML = '<span class="err">falhou</span> · ' + e.message;
+      } finally {
+        btn.disabled = false; btn.textContent = "Analisar estado atual";
+      }
+    }
+    document.getElementById("btnAi").onclick = analisar;
+
+    function renderAnalise() {
+      const host = document.getElementById("analysis"), tag = document.getElementById("aiTag");
+      if (!ANALISE.texto) {
+        tag.textContent = "";
+        host.innerHTML = '<div class="vazio">Nenhuma análise. O painel não escreve diagnóstico por conta própria: informe a chave do OpenRouter e o modelo ao lado, e mande analisar o estado atual.</div>';
+        return;
+      }
+      const a = ANALISE.texto;
+      const bcls = ANALISE.base === "medição" ? "b-med" : "b-sim";
+      tag.innerHTML = '<span class="base-tag ' + bcls + '">' + ANALISE.base + '</span>';
+
+      let h = "<p>" + (a.leitura || "") + "</p>";
+      (a.causas || []).forEach(c => {
+        const cc = "c-" + (c.confianca || "media").replace("é", "e");
+        h += '<div class="ai-item"><div class="t">' +
+          (c.zona ? '<span class="zone-tag z-amber">' + c.zona + '</span> ' : '') +
+          (c.causa || "") + '<span class="conf ' + cc + '">' + (c.confianca || "") + '</span></div>' +
+          '<div class="e"><b>apoia-se em:</b> ' + (c.evidencia || "—") + '</div>' +
+          (c.acao ? '<div class="e"><b>ação:</b> ' + c.acao + '</div>' : '') + '</div>';
+      });
+      if (a.sintoma) h += '<p><b>No atendimento:</b> ' + a.sintoma + '</p>';
+      if ((a.verificacoes || []).length) {
+        h += '<p><b>Para confirmar:</b></p><div>';
+        a.verificacoes.forEach(x => h += '<div class="ai-item"><div class="t">' + x + '</div></div>');
+        h += '</div>';
+      }
+      if (a.ressalva) h += '<p style="color:var(--mute)"><b>Não determinado:</b> ' + a.ressalva + '</p>';
+      h += '<p style="color:var(--dim);font-family:var(--mono);font-size:10.5px;margin-top:14px">' +
+        ANALISE.modelo + ' · ' + ANALISE.em + ' · o veredito e os fatos acima vêm do motor, não do modelo de linguagem</p>';
+      host.innerHTML = h;
+    }
+
+    function limparAnalise() { ANALISE.texto = null; renderAnalise(); }
+    renderAnalise();
+
+    /* ======================= CENÁRIOS COMO ARQUIVO ======================= */
+    function carregarCenarios(j, origem) {
+      if (!ENV) { document.getElementById("scnSrc").innerHTML = '<span class="err">carregue a topologia primeiro.</span>'; return; }
+      const lista = Array.isArray(j) ? j : (j.cenarios || []);
+      if (!Array.isArray(lista)) throw new Error("arquivo sem lista de cenários");
+      ENV.cenarios = lista;
+      montarControles(); render();
+      document.getElementById("scnSrc").innerHTML =
+        '<span class="good">' + lista.length + ' cenário(s)</span> · fonte: <b>' + origem + '</b>';
+    }
+    document.getElementById("btnScnUrl").onclick = async () => {
+      const u = document.getElementById("scnUrl").value.trim(); if (!u) return;
+      try { carregarCenarios(await buscar(u), u); } catch (e) { erro("scnSrc", e); }
+    };
+    document.getElementById("btnScnFile").onclick = () => document.getElementById("scnFile").click();
+    document.getElementById("scnFile").onchange = e => {
+      const f = e.target.files[0]; if (!f) return;
+      const rd = new FileReader();
+      rd.onload = () => { try { carregarCenarios(JSON.parse(rd.result), f.name); } catch (x) { erro("scnSrc", x); } };
+      rd.readAsText(f);
+    };
+
+    /* exporta o estado atual como cenário, para colar no arquivo do Git */
+    document.getElementById("btnScnExport").onclick = () => {
+      if (!ENV) return;
+      const dif = (grupo, alvo) => {
+        const o = {}; Object.keys(S[grupo]).forEach(k => { if (S[grupo][k] !== alvo(k)) o[k] = S[grupo][k]; });
+        return Object.keys(o).length ? o : null;
+      };
+      const aplica = {};
+      const f = dif("fluxos", k => { const x = ENV.fluxos.find(y => y.id === k); return x ? x.padrao !== false : true; });
+      const c = dif("condicoes", () => false);
+      const n = dif("nos", () => true);
+      const se = dif("sem_efeito", () => false);
+      if (f) aplica.fluxos = f; if (c) aplica.condicoes = c; if (n) aplica.nos = n; if (se) aplica.sem_efeito = se;
+      const cen = { id: "cenario-" + Date.now().toString(36), nome: "(dê um nome)", detalhe: "(descreva em uma linha)", aplica: aplica };
+      document.getElementById("scnExportBox").classList.remove("hidden");
+      const ta = document.getElementById("scnExport");
+      ta.value = JSON.stringify(cen, null, 2);
+      ta.select();
+    };
+
+    /* ======================= VARREDURA DE FALHAS ======================= */
+
+    function varrer(profundidade) { SWEEP = calcularVarredura(profundidade); renderVarredura(); }
+
+    function renderVarredura() {
+      const host = document.getElementById("sweep"), tag = document.getElementById("sweepTag");
+      if (!SWEEP) { return; }
+      const it = SWEEP.itens;
+      const fail = it.filter(x => x.nivel === "fail");
+      const deg = it.filter(x => x.nivel === "deg");
+      const ok = it.filter(x => x.nivel === "ok");
+      const unico = x => x.eventos.length === 1;
+
+      tag.textContent = SWEEP.total + " combinações · base: " + SWEEP.base;
+
+      const linha = (x, cls, rot) => {
+        const evs = x.eventos.map(e =>
+          '<b>' + e.rotulo + '</b> <span>· ' + e.contexto + '</span>').join('<br>') +
+          (x.porPerfil && x.porPerfil.length > 1
+            ? '<br><span>' + x.porPerfil.map(p => p.nome + ": " + p.titulo).join("  ·  ") + '</span>'
+            : '');
+        const ap = JSON.stringify(x.eventos.map(e => ({ g: e.grupo, r: e.ref })));
+        return '<div class="sw-row"><span class="sw-tag ' + cls + '">' + rot + '</span>' +
+          '<div class="ev">' + evs + '</div>' +
+          '<button class="sw-apply" data-ev=\'' + ap + '\'>aplicar</button></div>';
+      };
+
+      let h = '<div class="sweep-sum">' +
+        '<div><div class="n" style="color:var(--red)">' + fail.filter(unico).length + '</div><div class="l">ponto único de falha</div></div>' +
+        '<div><div class="n" style="color:var(--amber)">' + deg.filter(unico).length + '</div><div class="l">degrada sem erro</div></div>' +
+        '<div><div class="n" style="color:var(--red)">' + fail.length + '</div><div class="l">interrompe no total</div></div>' +
+        '<div><div class="n" style="color:var(--mute)">' + ok.length + '</div><div class="l">sem efeito</div></div>' +
+        '</div>';
+
+      if (fail.filter(unico).length) {
+        h += '<div class="sw-h">um evento sozinho derruba a sessão</div>';
+        fail.filter(unico).forEach(x => h += linha(x, "t-fail", "interrompe"));
+      }
+      if (deg.filter(unico).length) {
+        h += '<div class="sw-h">um evento sozinho degrada sem gerar erro — o caso que some do monitoramento</div>';
+        deg.filter(unico).forEach(x => h += linha(x, "t-deg", "degrada"));
+      }
+      if (SWEEP.profundidade >= 2) {
+        const emg = it.filter(x => x.emergente);
+        if (emg.length) {
+          h += '<div class="sw-h">emergentes: a dupla é pior do que cada evento sozinho (' + emg.length + ') — o risco que a varredura simples esconde</div>';
+          emg.forEach(x => h += linha(x, x.nivel === "fail" ? "t-fail" : "t-deg", x.nivel === "fail" ? "interrompe" : "degrada"));
+        }
+        const f2 = fail.filter(x => !unico(x) && !x.emergente), d2 = deg.filter(x => !unico(x) && !x.emergente);
+        if (f2.length) {
+          h += '<div class="sw-h">dois eventos juntos derrubam, já explicado por um deles (' + f2.length + ')</div>';
+          f2.slice(0, 12).forEach(x => h += linha(x, "t-fail", "interrompe"));
+          if (f2.length > 12) h += '<div class="vazio" style="padding-top:8px">+ ' + (f2.length - 12) + ' combinações do mesmo tipo</div>';
+        }
+        if (d2.length) {
+          h += '<div class="sw-h">dois eventos juntos degradam, já explicado por um deles (' + d2.length + ')</div>';
+          d2.slice(0, 12).forEach(x => h += linha(x, "t-deg", "degrada"));
+          if (d2.length > 12) h += '<div class="vazio" style="padding-top:8px">+ ' + (d2.length - 12) + ' combinações do mesmo tipo</div>';
+        }
+      }
+      if (ok.filter(unico).length) {
+        h += '<div class="sw-h">sem efeito nenhum no modelo</div>';
+        ok.filter(unico).forEach(x => h += linha(x, "t-ok", "indiferente"));
+      }
+      host.innerHTML = h;
+
+      host.querySelectorAll(".sw-apply").forEach(b => b.onclick = () => {
+        JSON.parse(b.dataset.ev).forEach(e => {
+          if (e.g === "fluxos") S.fluxos[e.r] = false;
+          else if (e.g === "condicoes") S.condicoes[e.r] = true;
+          else S.nos[e.r] = false;
+        });
+        cenarioAtivo = null; limparAnalise(); montarControles(); render();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+    }
+    document.getElementById("btnSweep1").onclick = () => { if (ENV) varrer(1); };
+    document.getElementById("btnSweep2").onclick = () => { if (ENV) varrer(2); };
+
+    /* ======================= IA SUGERE CENÁRIOS ======================= */
+    const PROMPT_CENARIOS = [
+      "Você recebe a topologia de um caminho de rede Citrix Rendezvous V2 com EDT e, quando houver, o resultado de uma varredura exaustiva já executada pelo motor.",
+      "Proponha cenários de falha plausíveis que valham a pena testar e que não estejam óbvios na lista existente.",
+      "",
+      "Regras:",
+      "1. Só use ids que existem na topologia recebida. Cenário com id inventado é descartado.",
+      "2. Não afirme o resultado do cenário. Quem calcula o resultado é o motor, não você. Descreva a situação, não o desfecho.",
+      "3. Prefira combinações realistas de operação: mudança de firewall, proxy, manutenção, comportamento do cliente.",
+      "4. Português do Brasil, direto, sem floreio.",
+      "",
+      "Responda SOMENTE com JSON, sem markdown:",
+      '{"cenarios":[{"id":"","nome":"","detalhe":"uma linha","motivo":"por que vale testar","aplica":{"fluxos":{"id":false},"condicoes":{"id":true},"nos":{"id":false}}}]}'
+    ].join("\n");
+
+    document.getElementById("btnScnAi").onclick = async () => {
+      if (!ENV) { document.getElementById("scnSrc").innerHTML = '<span class="err">carregue a topologia primeiro.</span>'; return; }
+      const modelo = document.getElementById("aiModel").value.trim();
+      if (!AI_KEY || !modelo) { document.getElementById("scnSrc").innerHTML = '<span class="err">informe a chave e o modelo na seção de IA.</span>'; return; }
+
+      const ctx = {
+        topologia: ENV.fluxos.map(f => ({ id: f.id, proto: f.proto, porta: f.porta, destino: f.destino, zona: znome(f.zona), estagio: f.estagio, papel: f.papel })),
+        condicoes: (ENV.condicoes || []).map(c => ({ id: c.id, nome: c.nome, bloqueia: c.bloqueia || [], degrada: c.degrada || [] })),
+        componentes: ENV.nos.filter(n => n.id in S.nos).map(n => ({ id: n.id, nome: n.nome, zona: znome(n.zona) })),
+        cenarios_existentes: (ENV.cenarios || []).map(c => c.nome),
+        varredura: SWEEP ? {
+          base: SWEEP.base, profundidade: SWEEP.profundidade,
+          interrompe: SWEEP.itens.filter(x => x.nivel === "fail").length,
+          degrada: SWEEP.itens.filter(x => x.nivel === "deg").length
+        } : null
+      };
+
+      document.getElementById("scnSrc").textContent = "consultando o modelo…";
+      try {
+        const r = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+          method: "POST",
+          headers: { "Authorization": "Bearer " + AI_KEY, "Content-Type": "application/json", "X-Title": "gemeo-citrix" },
+          body: JSON.stringify({
+            model: modelo, temperature: 0.4, messages: [
+              { role: "system", content: PROMPT_CENARIOS },
+              { role: "user", content: JSON.stringify(ctx) }
+            ]
+          })
+        });
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        const data = await r.json();
+        let txt = (((data.choices || [])[0] || {}).message || {}).content || "";
+        const out = JSON.parse(txt.replace(/```json|```/g, "").trim());
+
+        const idsF = new Set(ENV.fluxos.map(f => f.id));
+        const idsC = new Set((ENV.condicoes || []).map(c => c.id));
+        const idsN = new Set(Object.keys(S.nos));
+        const valido = c => {
+          const a = c.aplica || {};
+          return Object.keys(a.fluxos || {}).every(k => idsF.has(k))
+            && Object.keys(a.condicoes || {}).every(k => idsC.has(k))
+            && Object.keys(a.nos || {}).every(k => idsN.has(k));
+        };
+        const novos = (out.cenarios || []).filter(valido).map(c => ({
+          id: "ia-" + (c.id || Math.random().toString(36).slice(2, 7)),
+          nome: "IA · " + (c.nome || "sugestão"),
+          detalhe: c.detalhe || c.motivo || "",
+          aplica: c.aplica || {}
+        }));
+        const desc = (out.cenarios || []).length - novos.length;
+        ENV.cenarios = (ENV.cenarios || []).concat(novos);
+        montarControles(); render();
+        document.getElementById("scnSrc").innerHTML =
+          '<span class="good">' + novos.length + ' sugestão(ões) adicionada(s)</span>' +
+          (desc ? ' · ' + desc + ' descartada(s) por id inexistente' : '') +
+          '<br>o resultado de cada uma é calculado pelo motor ao aplicar, não veio do modelo.';
+      } catch (e) { erro("scnSrc", e); }
+    };
+
+    /* ======================= PERGUNTA ABERTA ======================= */
+    /* A IA faz duas traduções e nenhuma decisão: texto -> estado, e resultado -> texto.
+       Quem calcula o desfecho é sempre o motor. */
+
+    const PERGUNTA = { texto: null, entendimento: null, alteracoes: [], fora: [], antes: null,
+                       hipoteses: { nos: [], fluxos: [], condicoes: [] }, hipDescartadas: [], comparacao: null, etapas: [] };
+
+    function esc(x) {
+      return String(x == null ? "" : x).replace(/[&<>"']/g, c =>
+        ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+    }
+
+    // Vocabulário e regras da extensão: as três chamadas (tradução, decomposição e
+    // correção) usam o mesmo texto, para não divergirem.
+    const REGRAS_VOCABULARIO = [
+      "O modelo tem um vocabulário fixo, e quase toda mudança de infraestrutura cabe nele quando decomposta:",
+      "- componente (nó): algo que precisa estar de pé. Pode ficar indisponível.",
+      "- fluxo: uma ligação entre dois componentes, dentro de um estágio. No estágio, fluxos com a MESMA preferência formam um caminho e precisam estar TODOS de pé; o motor usa o caminho de menor preferência que estiver inteiro. Em estágio com 'exige: todos', todo fluxo é requisito.",
+      "- condição: algo que bloqueia fluxos (não passam) ou degrada fluxos (passam, instáveis).",
+      "- regra sem efeito: regra de firewall que o modelo já sabe que não muda nada (veja 'por_que_nao_tem_efeito').",
+      "",
+      "Como decompor cada mudança que a pergunta descreve, nesta ordem:",
+      "a) Já existe no catálogo? Use o id existente em 'aplica'. Não crie hipótese para o que o catálogo cobre.",
+      "b) Algum estágio passa a DEPENDER de algo que não existe no catálogo para funcionar (algo que precisa estar de pé, uma ligação que precisa passar)? Declare o componente em 'extensao.nos' e as ligações em 'extensao.fluxos'. Se a coisa nova fica no meio de um caminho existente, os fluxos novos usam a MESMA preferência desse caminho (veja 'preferencia' no catálogo): viram dependência a mais.",
+      "c) Muda o que acontece com fluxos que já existem (bloqueia, filtra, atrasa)? Declare em 'extensao.condicoes' e ligue em 'aplica.condicoes'.",
+      "d) Abre uma rota alternativa? Declare fluxos numa preferência que ainda não existe no estágio, maior que as atuais, com um rótulo curto em 'caminho'.",
+      "e) Só vai para 'fora_do_modelo' o que muda a REGRA de avaliação (um estágio novo, a ordem dos estágios, a lógica de decisão) ou o funcionamento interno de algo sem mudar do que ele depende. Escreva exatamente a parte que não coube.",
+      "Teste de disponibilidade, para tudo que é NOVO na pergunta (sistema, serviço, appliance, provedor, rota): se isso ficar fora do ar, alguma etapa deixa de funcionar? Se sim, é dependência e vira componente e fluxo (item b), mesmo que o catálogo já agregue a função dela num fluxo existente: a agregação descreve o que existia, não o que está entrando. Trocar um provedor por outro também conta: o novo é uma dependência que antes não existia.",
+      "As 'premissas' do catálogo descrevem o escopo da topologia revisada: o que ela NÃO cobre hoje. Hipóteses existem justamente para ir além desse escopo. Uma premissa dizer que algo 'não está modelado' nunca é motivo para não declarar uma dependência nova: é o sinal de que ela precisa de hipótese.",
+      "Uma mesma mudança costuma ter partes em mais de um item: modele as partes que cabem e deixe em 'fora_do_modelo' só o resto.",
+      "Não invente dependência para ter o que mostrar: se a mudança não cria dependência, não altera fluxo e não abre rota, ela é inteira 'fora_do_modelo'.",
+      "",
+      "Regras técnicas de toda hipótese (o validador do motor recusa o que violar):",
+      "- id começando com 'hip-' (a-z, 0-9, hífen), único, sem repetir id do catálogo nem de 'ja_declarado'.",
+      "- 'zona' é o campo 'id' de uma entrada de 'zonas' do catálogo, onde a coisa fica. 'justificativa' diz por que ela tem esse efeito. 'confianca' alta|media|baixa. No máximo 5 de cada tipo.",
+      "- componente só existe se algum fluxo novo o liga; componente sem fluxo é recusado.",
+      "- fluxo: 'de' e 'para' são ids de componente (do catálogo, de 'extensao.nos' ou de 'ja_declarado'), diferentes entre si; 'estagio' é um id de 'estagios'; 'proto' TCP|UDP|LOCAL; 'porta' de 1 a 65535 (0 só para LOCAL); 'papel' principal|fallback|alternativo; 'preferencia' inteiro de 1 a 9; 'destino' é FQDN ou descrição.",
+      "- condição: 'bloqueia' e 'degrada' com ids de fluxo (do catálogo ou de hipóteses); o mesmo fluxo não pode estar nos dois. Declare só o efeito DIRETO: não bloqueie um fluxo porque outro caiu, e não declare consequência em cadeia (fallback, sessão cair): isso é o motor que calcula.",
+      "- você só acrescenta: não dá para remover nem redirecionar um fluxo existente. Se a coisa nova fica no meio de um fluxo existente, o fluxo existente continua e o novo é dependência adicional.",
+      "- regras sem efeito só representam abrir ou fechar exatamente aquela regra; nunca representam uma rota nova, mesmo que use as mesmas portas.",
+      "",
+      "Esquema de 'extensao':",
+      '{"nos":[{"id":"hip-","nome":"","zona":"","justificativa":"","confianca":""}],"fluxos":[{"id":"hip-","nome":"","de":"","para":"","proto":"TCP|UDP|LOCAL","porta":443,"destino":"","zona":"","estagio":"","papel":"principal|fallback|alternativo","preferencia":1,"caminho":"","justificativa":"","confianca":""}],"condicoes":[{"id":"hip-","nome":"","zona":"","bloqueia":[],"degrada":[],"justificativa":"","confianca":""}]}'
+    ].join("\n");
+
+    const PROMPT_TRADUCAO = [
+      "Você traduz uma mudança descrita em texto para o estado de um modelo executável de rede Citrix. Você NÃO analisa consequência e NÃO diz o que vai acontecer: outro componente calcula isso.",
+      "",
+      REGRAS_VOCABULARIO,
+      "",
+      "Semântica de 'aplica': em 'fluxos', false = regra de saída ausente ou bloqueada, true = liberada. Em 'condicoes', true = a condição está presente no caminho. Em 'nos', false = componente indisponível. Em 'sem_efeito', true = a regra existe no firewall.",
+      "Se nada da pergunta puder ser traduzido, devolva 'aplica' e 'extensao' vazios. Não force aproximação para parecer útil.",
+      "'entendimento': só a mudança, em uma frase, em português do Brasil, sem desfecho.",
+      "",
+      "Responda SOMENTE com JSON, sem markdown:",
+      '{"entendimento":"","aplica":{"fluxos":{},"condicoes":{},"nos":{},"sem_efeito":{}},"extensao":{},"fora_do_modelo":[""],"confianca":"alta|media|baixa"}'
+    ].join("\n");
+
+    // 2ª passada: só sobre o que a tradução deixou fora do modelo.
+    const PROMPT_DECOMPOSICAO = [
+      "Uma primeira tradução deixou alguns itens fora de um modelo executável de rede Citrix. Revise cada item com o procedimento abaixo e extraia o que couber no vocabulário. Você NÃO analisa consequência.",
+      "",
+      REGRAS_VOCABULARIO,
+      "",
+      "'ja_declarado' é o que a primeira tradução já modelou: pode referenciar esses ids, mas não os repita nem os redeclare.",
+      "Para cada item, diga em 'decomposto' o que virou modelo (uma frase, ou vazio) e em 'restante' a parte que continua fora (ou vazio). Itens que não criam dependência, não alteram fluxo e não abrem rota ficam inteiros em 'restante'.",
+      "",
+      "Responda SOMENTE com JSON, sem markdown:",
+      '{"itens":[{"item":"","decomposto":"","restante":""}],"aplica":{"fluxos":{},"condicoes":{},"nos":{}},"extensao":{}}'
+    ].join("\n");
+
+    // autocorreção: uma tentativa sobre o que o validador recusou.
+    const PROMPT_CORRECAO = [
+      "O validador de um modelo executável de rede Citrix recusou algumas hipóteses. Corrija cada uma usando o catálogo e o motivo informado, mantendo a intenção original. Você NÃO analisa consequência.",
+      "",
+      REGRAS_VOCABULARIO,
+      "",
+      "'ja_aceito' são hipóteses que passaram: pode referenciá-las, não as repita.",
+      "Devolva em 'extensao' só as versões corrigidas, cada uma com o campo 'corrige' trazendo o id recusado que ela substitui. Se a correção exigiria inventar algo que o catálogo não tem, não corrija: explique em 'desistencias'.",
+      "",
+      "Responda SOMENTE com JSON, sem markdown:",
+      '{"extensao":{},"desistencias":[{"id":"","motivo":""}]}'
+    ].join("\n");
+
+    function catalogoParaTraducao() {
+      return {
+        fluxos: ENV.fluxos.filter(f => !f.hipotese).map(f => ({
+          id: f.id, significa: f.nome, de: f.de, para: f.para, proto: f.proto, porta: f.porta, destino: f.destino,
+          zona: znome(f.zona), estagio: f.estagio, papel: f.papel, preferencia: f.preferencia || null,
+          estado_atual: !!S.fluxos[f.id]
+        })),
+        estagios: ENV.estagios.map(e => ({ id: e.id, nome: e.nome, exige: e.exige, caminhos: e.caminhos || null })),
+        todos_os_nos: ENV.nos.filter(n => !n.hipotese).map(n => ({ id: n.id, nome: n.nome, zona: n.zona })),
+        condicoes: (ENV.condicoes || []).map(c => ({
+          id: c.id, significa: c.nome, detalhe: c.detalhe || "", zona: znome(c.zona), estado_atual: !!S.condicoes[c.id]
+        })),
+        nos: ENV.nos.filter(n => n.id in S.nos).map(n => ({
+          id: n.id, significa: n.nome, zona: znome(n.zona), disponivel_agora: !!S.nos[n.id]
+        })),
+        sem_efeito: (ENV.regras_sem_efeito || []).map(r => ({
+          id: r.id, significa: r.nome, por_que_nao_tem_efeito: r.veredito || r.detalhe || "", estado_atual: !!S.sem_efeito[r.id]
+        })),
+        zonas: ENV.zonas.map(z => ({ id: z.id, nome: z.nome })),
+        perfis: perfisDoEnv().map(p => p.nome),
+        premissas: ENV.premissas || null
+      };
+    }
+
+    function rotuloDe(grupo, id) {
+      if (grupo === "fluxos") { const f = ENV.fluxos.find(x => x.id === id); return f ? (f.hipotese ? "hipótese · " : "") + f.proto + " " + f.porta + " → " + f.destino + " (" + znome(f.zona) + ")" : id; }
+      if (grupo === "condicoes") { const c = (ENV.condicoes || []).find(x => x.id === id); return c ? (c.hipotese ? "hipótese · " : "") + c.nome : id; }
+      if (grupo === "nos") { const n = ENV.nos.find(x => x.id === id); return n ? (n.hipotese ? "hipótese · " : "") + n.nome : id; }
+      const r = (ENV.regras_sem_efeito || []).find(x => x.id === id); return r ? r.nome : id;
+    }
+    function descreveMudanca(grupo, id, valor) {
+      const rot = rotuloDe(grupo, id);
+      if (grupo === "fluxos") return rot + " — " + (valor ? "liberado" : "bloqueado");
+      if (grupo === "condicoes") return rot + " — " + (valor ? "presente no caminho" : "removida");
+      if (grupo === "nos") return rot + " — " + (valor ? "disponível" : "indisponível");
+      return rot + " — " + (valor ? "regra presente no firewall" : "regra removida");
+    }
+
+    async function chamarIA(sistema, conteudo) {
+      const modelo = document.getElementById("aiModel").value.trim();
+      const r = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: { "Authorization": "Bearer " + AI_KEY, "Content-Type": "application/json", "X-Title": "gemeo-citrix" },
+        body: JSON.stringify({
+          model: modelo, temperature: 0.1, messages: [
+            { role: "system", content: sistema },
+            { role: "user", content: JSON.stringify(conteudo) }
+          ]
+        })
+      });
+      if (!r.ok) throw new Error("HTTP " + r.status + " · " + (await r.text()).slice(0, 160));
+      const data = await r.json();
+      const txt = (((data.choices || [])[0] || {}).message || {}).content || "";
+      return JSON.parse(txt.replace(/```json|```/g, "").trim());
+    }
+
+    const TIPOS_EXT = ["nos", "fluxos", "condicoes"];
+    function juntarExtensao(a, b) {
+      const out = {};
+      TIPOS_EXT.forEach(k => out[k] = [].concat((a && a[k]) || [], (b && b[k]) || []));
+      return out;
+    }
+    function semItens(ext, itens) {
+      const fora = new Set(itens);
+      const out = {};
+      TIPOS_EXT.forEach(k => out[k] = ((ext && ext[k]) || []).filter(x => !fora.has(x)));
+      return out;
+    }
+    function resumoAceitas(v) {
+      return {
+        nos: v.aceitas.nos.map(n => ({ id: n.id, nome: n.nome, zona: n.zona })),
+        fluxos: v.aceitas.fluxos.map(f => ({ id: f.id, nome: f.nome, de: f.de, para: f.para, estagio: f.estagio, preferencia: f.preferencia })),
+        condicoes: v.aceitas.condicoes.map(c => ({ id: c.id, nome: c.nome }))
+      };
+    }
+
+    // Valida a extensão; o que o validador recusar volta à IA uma vez, com o motivo.
+    // Devolve só itens válidos; as recusas finais vão para `recusas`.
+    async function consolidar(ext, catalogo, etapas, recusas, status) {
+      const v0 = validarExtensao(ext);
+      if (!v0.descartadas.length) return { ext, v: v0 };
+
+      status("corrigindo hipóteses recusadas…");
+      let corrigidas = {}, desistencias = [], erro = null;
+      try {
+        const r = await chamarIA(PROMPT_CORRECAO, {
+          recusadas: v0.descartadas.map(d => ({ id: d.id, tipo: d.tipo, motivo: d.motivo, como_veio: d.orig || null })),
+          ja_aceito: resumoAceitas(v0), catalogo
+        });
+        corrigidas = r.extensao || {};
+        desistencias = r.desistencias || [];
+      } catch (e) { erro = e.message; }
+
+      // troca as recusadas pelas versões corrigidas; o que ainda não passa sai de vez
+      let novo = juntarExtensao(semItens(ext, v0.descartadas.map(d => d.orig)), corrigidas);
+      const v1 = validarExtensao(novo);
+      novo = semItens(novo, v1.descartadas.map(d => d.orig));
+      const v = validarExtensao(novo);
+
+      const aceitos = new Set(TIPOS_EXT.flatMap(k => v.aceitas[k].map(x => x.id)));
+      const versoes = TIPOS_EXT.flatMap(k => corrigidas[k] || []);
+      const ok = [];
+      v0.descartadas.forEach(d => {
+        const cv = versoes.find(x => x && x.corrige === d.id);
+        if (cv && aceitos.has(cv.id)) { ok.push(d.id + (cv.id !== d.id ? " → " + cv.id : "")); return; }
+        const des = desistencias.find(x => x && x.id === d.id);
+        const falhou = cv && v1.descartadas.find(x => x.orig === cv);
+        recusas.push({ id: d.id, tipo: d.tipo, motivo: des ? "sem correção possível: " + des.motivo
+          : falhou ? "a correção também foi recusada: " + falhou.motivo
+          : d.motivo + (erro ? "" : " (não voltou corrigida)") });
+      });
+      etapas.push({ tipo: "correcao", recusadas: v0.descartadas.map(d => d.id + ": " + d.motivo), corrigidas: ok, erro });
+      return { ext: novo, v };
+    }
+
+    async function perguntar() {
+      const texto = document.getElementById("pergunta").value.trim();
+      const out = document.getElementById("pergOut");
+      if (!ENV) { out.innerHTML = '<div class="vazio">Carregue um ambiente primeiro.</div>'; return; }
+      if (!texto) return;
+      const modelo = document.getElementById("aiModel").value.trim();
+      if (!AI_KEY || !modelo) { out.innerHTML = '<div class="vazio">Informe a chave e o modelo na seção de IA, no painel ao lado.</div>'; return; }
+
+      const btn = document.getElementById("btnPerg");
+      const status = t => { btn.textContent = t; out.innerHTML = '<div class="vazio">' + t + '</div>'; };
+      btn.disabled = true; status("traduzindo…");
+
+      try {
+        // a tradução enxerga só a topologia revisada, não as hipóteses da pergunta anterior
+        const catalogo = semHipoteses(() => catalogoParaTraducao());
+        const tr = await chamarIA(PROMPT_TRADUCAO, { pergunta: texto, catalogo });
+
+        // hipóteses da pergunta anterior não valem para esta
+        removerHipoteses();
+
+        const etapas = [], recusas = [];
+        let { ext, v } = await consolidar(tr.extensao || {}, catalogo, etapas, recusas, status);
+        const aplica = tr.aplica || {};
+        let fora = (tr.fora_do_modelo || []).filter(x => x && String(x).trim());
+
+        // 2ª passada: o que ficou fora volta à IA para extrair o que couber no vocabulário
+        if (fora.length) {
+          status("decompondo o que ficou fora do modelo…");
+          try {
+            const d = await chamarIA(PROMPT_DECOMPOSICAO, { pergunta: texto, fora_do_modelo: fora, ja_declarado: resumoAceitas(v), catalogo });
+            ["fluxos", "condicoes", "nos", "sem_efeito"].forEach(g => {
+              if (d.aplica && d.aplica[g]) aplica[g] = Object.assign(aplica[g] || {}, d.aplica[g]);
+            });
+            const itens = (d.itens || []).filter(i => i && i.item);
+            etapas.push({ tipo: "decomposicao", itens });
+            ({ ext, v } = await consolidar(juntarExtensao(ext, d.extensao), catalogo, etapas, recusas, status));
+            fora = itens.length ? itens.map(i => i.restante).filter(x => x && String(x).trim()) : fora;
+          } catch (e) { etapas.push({ tipo: "decomposicao", erro: e.message, itens: [] }); }
+        }
+
+        aplicarExtensao(v.aceitas);
+
+        // valida ids antes de encostar no estado
+        aplica.condicoes = aplica.condicoes || {};
+        v.aceitas.condicoes.forEach(c => aplica.condicoes[c.id] = true);   // condição aceita é a mudança descrita
+        const alteracoes = [], descartados = [];
+        ["fluxos", "condicoes", "nos", "sem_efeito"].forEach(g => {
+          Object.keys(aplica[g] || {}).forEach(id => {
+            if (!(id in S[g])) {
+              // hipótese rejeitada já aparece com o motivo; não repete como referência
+              if (!recusas.some(d => d.id === id)) descartados.push(g + ":" + id);
+              return;
+            }
+            const valor = !!aplica[g][id];
+            if (S[g][id] === valor) return;                 // já está assim, não é mudança
+            alteracoes.push({ grupo: g, id: id, valor: valor, texto: descreveMudanca(g, id, valor) });
+          });
+        });
+
+        PERGUNTA.texto = texto;
+        PERGUNTA.entendimento = tr.entendimento || "";
+        PERGUNTA.fora = fora;
+        PERGUNTA.etapas = etapas;
+        PERGUNTA.alteracoes = alteracoes;
+        PERGUNTA.antes = JSON.parse(JSON.stringify({ fluxos: S.fluxos, condicoes: S.condicoes, nos: S.nos, sem_efeito: S.sem_efeito }));
+
+        alteracoes.forEach(a => { S[a.grupo][a.id] = a.valor; });
+
+        // mesmo estado com e sem as hipóteses: mostra o quanto do veredito depende delas
+        PERGUNTA.hipoteses = v.aceitas;
+        PERGUNTA.hipDescartadas = recusas;
+        PERGUNTA.comparacao = null;
+        const temHip = TIPOS_EXT.some(k => v.aceitas[k].length);
+        if (temHip) {
+          const com = avaliar().perfis;
+          const sem = semHipoteses(() => avaliar().perfis);
+          PERGUNTA.comparacao = com.map((p, i) => ({
+            perfil: p.nome,
+            sem: { nivel: sem[i].nivel, titulo: sem[i].titulo },
+            com: { nivel: p.nivel, titulo: p.titulo }
+          }));
+        }
+
+        if (alteracoes.length || temHip) { cenarioAtivo = null; montarControles(); render(); }
+
+        renderPergunta(descartados, tr.confianca);
+        document.getElementById("btnPergUndo").classList.toggle("hidden", !alteracoes.length && !temHip);
+
+        if (alteracoes.length || temHip) await analisar(texto);
+        else document.getElementById("analysis").innerHTML =
+          '<div class="vazio">Nada foi aplicado ao modelo, então não há o que analisar.</div>';
+
+      } catch (e) {
+        out.innerHTML = '<div class="vazio">A tradução falhou: ' + esc(e.message) + '</div>';
+      } finally {
+        btn.disabled = false; btn.textContent = "Traduzir e simular";
+      }
+    }
+
+    function renderPergunta(descartados, confianca) {
+      const out = document.getElementById("pergOut");
+      const tag = document.getElementById("pergTag");
+      tag.innerHTML = confianca ? '<span class="conf c-' + confianca + '">tradução ' + confianca + '</span>' : "";
+
+      let h = '<div class="entendi"><b>Entendi assim:</b> ' + (PERGUNTA.entendimento || "—") + '</div>';
+
+      if (PERGUNTA.alteracoes.length) {
+        h += '<div class="sw-h">o que foi aplicado ao modelo — confira nos controles e no diagrama</div>';
+        PERGUNTA.alteracoes.forEach(a => h += '<div class="ai-item mud"><div class="t">' + a.texto + '</div></div>');
+      } else if (!(PERGUNTA.hipoteses.nos.length || PERGUNTA.hipoteses.fluxos.length || PERGUNTA.hipoteses.condicoes.length)) {
+        h += '<div class="ai-item"><div class="t">Nenhuma mudança foi aplicada.</div>' +
+          '<div class="e">Ou a situação já era essa, ou nada da pergunta existe no modelo.</div></div>';
+      }
+
+      const H = PERGUNTA.hipoteses || { nos: [], fluxos: [], condicoes: [] };
+      if (H.nos.length || H.fluxos.length || H.condicoes.length) {
+        h += '<div class="sw-h">hipóteses — criadas pela tradução, fora da topologia revisada</div>';
+        const nomeFluxo = id => { const f = ENV.fluxos.find(x => x.id === id); return f ? f.nome + " (" + id + ")" : id; };
+        const nomeNo = id => { const n = ENV.nos.find(x => x.id === id); return n ? n.nome : id; };
+        const cab = (tipo, c) => '<div class="t"><b>' + tipo + '</b> · ' + esc(c.nome) +
+          ' <span class="zone-tag ' + zcls(c.zona) + '">' + esc(znome(c.zona)) + '</span>' +
+          '<span class="conf c-' + c.confianca + '">' + c.confianca + '</span></div>';
+        const pq = c => '<div class="e"><b>por quê:</b> ' + esc(c.justificativa) + '</div>';
+        H.nos.forEach(n => {
+          h += '<div class="ai-item hip">' + cab("componente novo", n) + pq(n) + '</div>';
+        });
+        H.fluxos.forEach(f => {
+          const e = ENV.estagios.find(x => x.id === f.estagio);
+          const irmaos = ENV.fluxos.filter(x => !x.hipotese && x.estagio === f.estagio && (x.preferencia || 1) === f.preferencia);
+          const papel = e && e.exige === "preferencial"
+            ? (irmaos.length ? "dependência a mais do caminho " + f.preferencia + ((e.caminhos || {})[f.preferencia] ? " (" + e.caminhos[f.preferencia] + ")" : "")
+              : "caminho novo, preferência " + f.preferencia)
+            : "requisito do estágio";
+          h += '<div class="ai-item hip">' + cab("fluxo novo", f) +
+            '<div class="e"><b>ligação:</b> ' + esc(nomeNo(f.de)) + ' → ' + esc(nomeNo(f.para)) + ' · ' +
+            esc(f.proto === "LOCAL" ? "local" : f.proto + " " + f.porta) + ' · ' + esc(f.destino) + '</div>' +
+            '<div class="e"><b>no motor:</b> ' + esc((e ? e.nome : f.estagio) + " · " + papel) + '</div>' + pq(f) + '</div>';
+        });
+        H.condicoes.forEach(c => {
+          h += '<div class="ai-item hip">' + cab("condição nova", c) +
+            (c.bloqueia.length ? '<div class="e"><b>bloqueia:</b> ' + c.bloqueia.map(nomeFluxo).map(esc).join(", ") + '</div>' : '') +
+            (c.degrada.length ? '<div class="e"><b>degrada:</b> ' + c.degrada.map(nomeFluxo).map(esc).join(", ") + '</div>' : '') +
+            pq(c) + '</div>';
+        });
+        if (PERGUNTA.comparacao) {
+          const n = x => '<span class="n-' + x.nivel + '">' + esc(x.titulo) + '</span>';
+          h += '<div class="cmp">';
+          PERGUNTA.comparacao.forEach(c => {
+            h += '<div class="k">' + esc(c.perfil) + (c.sem.nivel === c.com.nivel && c.sem.titulo === c.com.titulo ? ' · a hipótese não muda o veredito' : '') + '</div>' +
+              '<div>sem a hipótese: ' + n(c.sem) + '</div><div class="seta">→</div><div>com a hipótese: ' + n(c.com) + '</div>';
+          });
+          h += '</div>';
+        }
+        h += '<div class="e" style="color:var(--mute);font-size:12px">A estrutura de cada hipótese foi declarada pela IA; o veredito em cima disso é do motor. ' +
+          'Se a hipótese estiver errada, o veredito também está.</div>';
+        h += '<details class="candidata"><summary>levar para a topologia: condição candidata e caso de teste</summary><pre>' +
+          esc(JSON.stringify(candidataParaTopologia(), null, 2)) + '</pre></details>';
+      }
+      if (PERGUNTA.hipDescartadas.length) {
+        const tipo = { nos: "componente", fluxos: "fluxo", condicoes: "condição" };
+        h += '<div class="ai-item fora"><div class="t">' + PERGUNTA.hipDescartadas.length + ' hipótese(s) descartada(s) pela validação</div>' +
+          '<div class="e">' + PERGUNTA.hipDescartadas.map(d => (tipo[d.tipo] || "") + ' ' + esc(d.id) + ': ' + esc(d.motivo)).join("<br>") + '</div></div>';
+      }
+
+      const etapas = PERGUNTA.etapas || [];
+      if (etapas.length) {
+        h += '<div class="sw-h">como a tradução chegou aqui</div>';
+        etapas.forEach(e => {
+          if (e.tipo === "decomposicao") {
+            h += '<div class="ai-item"><div class="t">2ª passada sobre o que ficou fora do modelo</div>' +
+              (e.erro ? '<div class="e">a chamada falhou (' + esc(e.erro) + '); os itens seguem fora do modelo</div>' : '') +
+              (e.itens || []).map(i => '<div class="e"><b>' + esc(i.item) + '</b><br>' +
+                (i.decomposto ? 'virou modelo: ' + esc(i.decomposto) : 'nada coube no vocabulário') +
+                (i.restante ? '<br>continua fora: ' + esc(i.restante) : '') + '</div>').join("") + '</div>';
+          } else if (e.tipo === "correcao") {
+            h += '<div class="ai-item"><div class="t">autocorreção: ' + e.recusadas.length + ' hipótese(s) recusada(s) pelo validador, ' +
+              e.corrigidas.length + ' corrigida(s)</div>' +
+              '<div class="e">' + e.recusadas.map(esc).join("<br>") + '</div>' +
+              (e.corrigidas.length ? '<div class="e"><b>corrigidas:</b> ' + e.corrigidas.map(esc).join(", ") + '</div>' : '') +
+              (e.erro ? '<div class="e">a chamada de correção falhou: ' + esc(e.erro) + '</div>' : '') + '</div>';
+          }
+        });
+      }
+
+      if (PERGUNTA.fora.length) {
+        h += '<div class="sw-h">fora do modelo — não entrou na simulação</div>';
+        PERGUNTA.fora.forEach(f => h += '<div class="ai-item fora"><div class="t">' + f + '</div>' +
+          '<div class="e">o modelo não representa isso, então o veredito abaixo não considera esse ponto. ' +
+          'Se for relevante para vocês, é candidato a entrar na topologia.</div></div>');
+      }
+      if (descartados && descartados.length) {
+        h += '<div class="ai-item fora"><div class="t">' + descartados.length + ' referência(s) inexistente(s) descartada(s)</div>' +
+          '<div class="e">' + descartados.join(", ") + '</div></div>';
+      }
+      out.innerHTML = h;
+    }
+
+    // formato pronto para revisão: a condição sem os campos de hipótese, no esquema
+    // do ambiente, e um caso para casos-*.json com o veredito que o motor deu agora.
+    function candidataParaTopologia() {
+      const H = PERGUNTA.hipoteses;
+      const usados = ENV.nos.concat(ENV.fluxos, ENV.condicoes || []).filter(x => !x.hipotese).map(x => x.id);
+      const ren = {};
+      H.nos.concat(H.fluxos, H.condicoes).forEach(x => {
+        let novo = x.id.replace(/^hip-/, "");
+        while (usados.indexOf(novo) >= 0) novo += "-novo";
+        usados.push(novo); ren[x.id] = novo;
+      });
+      const r = id => ren[id] || id;
+      const fonte = x => "a confirmar — proposta pela tradução: " + x.justificativa;
+      const nos = H.nos.map(n => ({ id: r(n.id), nome: n.nome, detalhe: "", zona: n.zona, disponibilidade: true }));
+      const fluxos = H.fluxos.map(f => ({
+        id: r(f.id), nome: f.nome, de: r(f.de), para: r(f.para), proto: f.proto, porta: f.porta,
+        destino: f.destino, zona: f.zona, estagio: f.estagio, papel: f.papel, preferencia: f.preferencia,
+        padrao: true, fonte: fonte(f)
+      }));
+      const condicoes = H.condicoes.map(c => ({
+        id: r(c.id), nome: c.nome, detalhe: "", zona: c.zona,
+        ...(c.bloqueia.length ? { bloqueia: c.bloqueia.map(r) } : {}),
+        ...(c.degrada.length ? { degrada: c.degrada.map(r), efeito: "instavel" } : {}),
+        fonte: fonte(c)
+      }));
+      const espera = {};
+      (PERGUNTA.comparacao || []).forEach(c => espera[c.perfil] = { nivel: c.com.nivel });
+      const aplica = { condicoes: {} };
+      condicoes.forEach(c => aplica.condicoes[c.id] = true);
+      const out = {};
+      if (nos.length) out.nos = nos;
+      if (fluxos.length) out.fluxos = fluxos;
+      if (condicoes.length) out.condicoes = condicoes;
+      out.caso = { nome: PERGUNTA.entendimento || PERGUNTA.texto, aplica, espera };
+      return out;
+    }
+
+    document.getElementById("btnPerg").onclick = perguntar;
+    document.getElementById("btnPergUndo").onclick = () => {
+      if (!PERGUNTA.antes) return;
+      ["fluxos", "condicoes", "nos", "sem_efeito"].forEach(g => S[g] = JSON.parse(JSON.stringify(PERGUNTA.antes[g])));
+      removerHipoteses();
+      PERGUNTA.alteracoes = []; PERGUNTA.antes = null;
+      PERGUNTA.hipoteses = { nos: [], fluxos: [], condicoes: [] }; PERGUNTA.hipDescartadas = []; PERGUNTA.comparacao = null; PERGUNTA.etapas = [];
+      document.getElementById("btnPergUndo").classList.add("hidden");
+      document.getElementById("pergOut").innerHTML = '<div class="vazio">estado anterior restaurado.</div>';
+      document.getElementById("pergTag").innerHTML = "";
+      limparAnalise(); montarControles(); render();
+    };
+
+    vazio();
+
+    /* ======================= ABERTURA POR URL ======================= */
+    /* ?ambiente=...&cenarios=...&observado=  — o painel abre com tudo dentro,
+       sem ninguém precisar escolher arquivo na frente da plateia. */
+    (async function bootCredenciais() {
+      /* credenciais.local.json fica fora do Git. O HTML nunca guarda a chave. */
+      try {
+        const r = await fetch("credenciais.local.json", { cache: "no-store" });
+        if (!r.ok) return;
+        const c = await r.json();
+        if (c.openrouter_key) {
+          AI_KEY = c.openrouter_key;
+          document.getElementById("aiKey").value = c.openrouter_key;
+        }
+        if (c.modelo) document.getElementById("aiModel").value = c.modelo;
+        document.getElementById("aiSrc").innerHTML =
+          '<span class="good">credenciais carregadas</span> · credenciais.local.json';
+      } catch (e) { /* sem arquivo, segue com os campos vazios */ }
+    })();
+
+    (async function bootUrl() {
+      const q = new URLSearchParams(location.search);
+      const amb = q.get("ambiente"), cen = q.get("cenarios"), obs = q.get("observado");
+      if (!amb) return;
+      try {
+        document.getElementById("envUrl").value = amb;
+        carregarEnv(await buscar(amb), amb);
+        if (cen) { document.getElementById("scnUrl").value = cen; carregarCenarios(await buscar(cen), cen); }
+        if (obs) { document.getElementById("obsUrl").value = obs; carregarObs(await buscar(obs), obs); }
+        // ?atualizar=N — reler a coleta a cada N segundos, como o agente publica
+        const seg = parseInt(q.get("atualizar") || "0", 10);
+        if (obs && seg >= 2) {
+          const tag = document.getElementById("modeTag");
+          setInterval(async () => {
+            try {
+              const j = await buscar(obs);
+              if (!OBS || j.coletado_em !== OBS.coletado_em) {
+                carregarObs(j, obs);
+                tag.classList.add("pulso");
+                setTimeout(() => tag.classList.remove("pulso"), 900);
+              }
+            } catch (e) { /* o agente pode estar entre ciclos */ }
+          }, seg * 1000);
+          document.getElementById("aoVivo").style.display = "inline-flex";
+        }
+
+        const c = q.get("cenario");
+        if (c) {
+          const alvo = (ENV.cenarios || []).find(x => x.id === c);
+          if (alvo) {
+            const a = alvo.aplica || {};
+            ["fluxos", "condicoes", "nos", "sem_efeito"].forEach(g => { if (a[g]) Object.assign(S[g], a[g]); });
+            cenarioAtivo = alvo.id; montarControles(); render();
+          }
+        }
+      } catch (e) {
+        document.getElementById("envSrc").innerHTML =
+          '<span class="err">falha ao abrir pela URL</span> · ' + e.message +
+          '<br>abra pelo servidor local (iniciar.sh), não por file://';
+      }
+    })();
+  </script>
+</body>
+
+</html>

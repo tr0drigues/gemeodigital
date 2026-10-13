@@ -1,0 +1,86 @@
+{
+  "schema": "gemeo-citrix-coletas/1.0",
+  "atualizado_em": "2026-09-14T16:15:00+00:00",
+  "coletas": [
+    {
+      "arquivo": "2026-09-14_1429.json",
+      "coletado_em": "2026-09-14T14:29:43.502841+00:00",
+      "pontos": [
+        "coletor-citrix.py / vda-01 / linux",
+        "coletor-citrix.py / estacao-cliente-01-01 / darwin"
+      ],
+      "ok": 3,
+      "com_falha": 0
+    },
+    {
+      "arquivo": "2026-09-14_1445.json",
+      "coletado_em": "2026-09-14T14:45:00+00:00",
+      "pontos": [
+        "coletor-citrix.py / vda-01 / linux",
+        "coletor-citrix.py / estacao-cliente-01 / darwin"
+      ],
+      "ok": 6,
+      "com_falha": 0
+    },
+    {
+      "arquivo": "2026-09-14_1500.json",
+      "coletado_em": "2026-09-14T15:00:00+00:00",
+      "pontos": [
+        "coletor-citrix.py / vda-01 / linux",
+        "coletor-citrix.py / estacao-cliente-01 / darwin"
+      ],
+      "ok": 5,
+      "com_falha": 1
+    },
+    {
+      "arquivo": "2026-09-14_1515.json",
+      "coletado_em": "2026-09-14T15:15:00+00:00",
+      "pontos": [
+        "coletor-citrix.py / vda-01 / linux",
+        "coletor-citrix.py / estacao-cliente-01 / darwin"
+      ],
+      "ok": 6,
+      "com_falha": 0
+    },
+    {
+      "arquivo": "2026-09-14_1530.json",
+      "coletado_em": "2026-09-14T15:30:00+00:00",
+      "pontos": [
+        "coletor-citrix.py / vda-01 / linux",
+        "coletor-citrix.py / estacao-cliente-01 / darwin"
+      ],
+      "ok": 3,
+      "com_falha": 1
+    },
+    {
+      "arquivo": "2026-09-14_1545.json",
+      "coletado_em": "2026-09-14T15:45:00+00:00",
+      "pontos": [
+        "coletor-citrix.py / vda-01 / linux",
+        "coletor-citrix.py / estacao-cliente-01 / darwin"
+      ],
+      "ok": 3,
+      "com_falha": 3
+    },
+    {
+      "arquivo": "2026-09-14_1600.json",
+      "coletado_em": "2026-09-14T16:00:00+00:00",
+      "pontos": [
+        "coletor-citrix.py / vda-01 / linux",
+        "coletor-citrix.py / estacao-cliente-01 / darwin"
+      ],
+      "ok": 5,
+      "com_falha": 1
+    },
+    {
+      "arquivo": "2026-09-14_1615.json",
+      "coletado_em": "2026-09-14T16:15:00+00:00",
+      "pontos": [
+        "coletor-citrix.py / vda-01 / linux",
+        "coletor-citrix.py / estacao-cliente-01 / darwin"
+      ],
+      "ok": 2,
+      "com_falha": 4
+    }
+  ]
+}

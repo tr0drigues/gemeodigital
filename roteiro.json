@@ -1,0 +1,14 @@
+{
+  "nome": "degradacao progressiva",
+  "descricao": "Sequencia de estados ja coletados, reproduzida em intervalo fixo.",
+  "passos": [
+    { "estado": "coletas/2026-09-14_1429.json", "nota": "ciclo normal" },
+    { "estado": "coletas/2026-09-14_1429.json", "nota": "ciclo normal" },
+    { "estado": "coletas/2026-09-14_1445.json", "nota": "rtt subindo nos dois pontos" },
+    { "estado": "coletas/2026-09-14_1500.json", "nota": "udp parou de responder na ponta do cliente" },
+    { "estado": "coletas/2026-09-14_1500.json", "nota": "segue sem udp no cliente" },
+    { "estado": "coletas/2026-09-14_1545.json", "nota": "o pop mudou de ip" },
+    { "estado": "coletas/2026-09-14_1615.json", "nota": "nenhum caminho chega ao dado hdx" },
+    { "estado": "coletas/2026-09-14_1429.json", "nota": "normalizado" }
+  ]
+}

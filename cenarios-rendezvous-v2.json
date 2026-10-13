@@ -1,0 +1,84 @@
+{
+  "schema": "gemeo-citrix-cenarios/1.0",
+  "ambiente": "rendezvous-v2-base",
+  "nota": "Cenarios separados da topologia de proposito: a topologia e revisada pela arquitetura, o cenario e de quem investiga.",
+  "cenarios": [
+    {
+      "id": "base",
+      "nome": "Conforme o modelo",
+      "detalhe": "tudo liberado, Rendezvous e EDT em pe",
+      "aplica": {}
+    },
+    {
+      "id": "udp-dc",
+      "nome": "Seguranca bloqueia UDP de saida",
+      "detalhe": "decisao tomada no datacenter",
+      "aplica": {
+        "fluxos": {
+          "edt-dc": false
+        }
+      }
+    },
+    {
+      "id": "udp-cli",
+      "nome": "Cliente bloqueia UDP na rede dele",
+      "detalhe": "sua regra esta correta",
+      "aplica": {
+        "fluxos": {
+          "edt-cli": false
+        }
+      }
+    },
+    {
+      "id": "tls",
+      "nome": "Inspecao TLS ligada na saida",
+      "detalhe": "o proxy abre o TLS do datacenter",
+      "aplica": {
+        "condicoes": {
+          "tls": true
+        }
+      }
+    },
+    {
+      "id": "ip",
+      "nome": "Regra por IP e a Citrix rotacionou",
+      "detalhe": "funcionou por semanas e parou",
+      "aplica": {
+        "condicoes": {
+          "ip-fixo": true
+        }
+      }
+    },
+    {
+      "id": "hdx-down",
+      "nome": "Endpoint de Dados HDX fora do ar",
+      "detalhe": "indisponibilidade do lado Citrix",
+      "aplica": {
+        "nos": {
+          "hdx": false
+        }
+      }
+    },
+    {
+      "id": "timeout",
+      "nome": "Timeout UDP curto no firewall",
+      "detalhe": "sessao ociosa some e volta",
+      "aplica": {
+        "condicoes": {
+          "udp-timeout": true
+        }
+      }
+    },
+    {
+      "id": "sem-efeito",
+      "nome": "Regras que nao fazem nada",
+      "detalhe": "inbound + 2598/1494 liberados",
+      "aplica": {
+        "sem_efeito": {
+          "inbound": true,
+          "legacy": true
+        }
+      }
+    }
+  ]
+}

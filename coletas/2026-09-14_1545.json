@@ -1,0 +1,151 @@
+{
+  "schema": "gemeo-citrix-observado/1.2",
+  "coletado_em": "2026-09-14T15:45:00+00:00",
+  "origem": "coletor-citrix.py / vda-01 / linux + coletor-citrix.py / estacao-cliente-01 / darwin",
+  "origens": [
+    "coletor-citrix.py / vda-01 / linux",
+    "coletor-citrix.py / estacao-cliente-01 / darwin"
+  ],
+  "alvos": {
+    "ctl-gw": "global.g.nssvc.net",
+    "reg-cloud": "<customer-id>.xendesktop.net",
+    "edt-dc": "echo-udp.interno",
+    "tcp-dc": "global.g.nssvc.net",
+    "edt-cli": "echo-udp.interno",
+    "tcp-cli": "global.g.nssvc.net"
+  },
+  "dns": {
+    "ctl-gw": {
+      "ok": true,
+      "ips": [
+        "3.220.71.249"
+      ],
+      "rotacionou": true,
+      "fqdn": "global.g.nssvc.net"
+    },
+    "reg-cloud": {
+      "ok": true,
+      "ips": [
+        "52.224.190.139"
+      ],
+      "rotacionou": false,
+      "fqdn": "<customer-id>.xendesktop.net"
+    }
+  },
+  "tls": {
+    "reg-cloud": {
+      "ok": true,
+      "validou": true,
+      "emissor": "DigiCert Inc",
+      "emissor_cn": "DigiCert Global G2 TLS RSA SHA256 2020 CA1",
+      "protocolo": "TLSv1.2",
+      "inspecao": false
+    }
+  },
+  "medicoes": {
+    "ctl-gw": [
+      {
+        "estado": "bloqueado",
+        "testado": true,
+        "ponto": "vda-01",
+        "origem": "coletor-citrix.py / vda-01 / linux",
+        "erro": "timeout em 4s"
+      }
+    ],
+    "reg-cloud": [
+      {
+        "estado": "ok",
+        "testado": true,
+        "ponto": "vda-01",
+        "origem": "coletor-citrix.py / vda-01 / linux",
+        "rtt_ms": 242
+      }
+    ],
+    "edt-dc": [
+      {
+        "estado": "bloqueado",
+        "testado": true,
+        "ponto": "vda-01",
+        "origem": "coletor-citrix.py / vda-01 / linux",
+        "erro": "sem resposta em 4s"
+      }
+    ],
+    "tcp-dc": [
+      {
+        "estado": "bloqueado",
+        "testado": true,
+        "ponto": "vda-01",
+        "origem": "coletor-citrix.py / vda-01 / linux",
+        "erro": "timeout em 4s"
+      }
+    ],
+    "edt-cli": [
+      {
+        "estado": "ok",
+        "testado": true,
+        "ponto": "estacao-cliente-01",
+        "origem": "coletor-citrix.py / estacao-cliente-01 / darwin",
+        "rtt_ms": 16
+      }
+    ],
+    "tcp-cli": [
+      {
+        "estado": "ok",
+        "testado": true,
+        "ponto": "estacao-cliente-01",
+        "origem": "coletor-citrix.py / estacao-cliente-01 / darwin",
+        "rtt_ms": 14
+      }
+    ]
+  },
+  "fluxos": {
+    "ctl-gw": {
+      "estado": "bloqueado",
+      "testado": true,
+      "ponto": "vda-01",
+      "origem": "coletor-citrix.py / vda-01 / linux",
+      "erro": "timeout em 4s"
+    },
+    "reg-cloud": {
+      "estado": "ok",
+      "testado": true,
+      "ponto": "vda-01",
+      "origem": "coletor-citrix.py / vda-01 / linux",
+      "rtt_ms": 242
+    },
+    "edt-dc": {
+      "estado": "bloqueado",
+      "testado": true,
+      "ponto": "vda-01",
+      "origem": "coletor-citrix.py / vda-01 / linux",
+      "erro": "sem resposta em 4s"
+    },
+    "tcp-dc": {
+      "estado": "bloqueado",
+      "testado": true,
+      "ponto": "vda-01",
+      "origem": "coletor-citrix.py / vda-01 / linux",
+      "erro": "timeout em 4s"
+    },
+    "edt-cli": {
+      "estado": "ok",
+      "testado": true,
+      "ponto": "estacao-cliente-01",
+      "origem": "coletor-citrix.py / estacao-cliente-01 / darwin",
+      "rtt_ms": 16
+    },
+    "tcp-cli": {
+      "estado": "ok",
+      "testado": true,
+      "ponto": "estacao-cliente-01",
+      "origem": "coletor-citrix.py / estacao-cliente-01 / darwin",
+      "rtt_ms": 14
+    }
+  },
+  "condicoes": {
+    "tls": false,
+    "ip-fixo": true,
+    "proxy-tcp": false
+  },
+  "sessoes": null
+}

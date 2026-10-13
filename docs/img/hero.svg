@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 420" width="1200" height="420" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b1220"/>
+      <stop offset="1" stop-color="#16122a"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.78" cy="0.45" r="0.55">
+      <stop offset="0" stop-color="#7c5cff" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#7c5cff" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M32 0H0V32" fill="none" stroke="#ffffff" stroke-opacity="0.04"/>
+    </pattern>
+    <filter id="soft" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="6"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="420" rx="18" fill="url(#bg)"/>
+  <rect width="1200" height="420" rx="18" fill="url(#grid)"/>
+  <rect width="1200" height="420" rx="18" fill="url(#glow)"/>
+
+  <!-- texto -->
+  <text x="64" y="92" fill="#e0b25c" font-size="15" font-weight="700" letter-spacing="4">GÊMEO DIGITAL</text>
+  <text x="64" y="150" fill="#f5f3ff" font-size="50" font-weight="800" letter-spacing="-1">Citrix Rendezvous V2</text>
+  <text x="64" y="206" fill="#f5f3ff" font-size="50" font-weight="800" letter-spacing="-1">+ EDT, <tspan fill="#a78bfa">executável.</tspan></text>
+  <text x="64" y="256" fill="#a3a9c2" font-size="18">O que acontece com a sessão quando uma regra de firewall muda,</text>
+  <text x="64" y="282" fill="#a3a9c2" font-size="18">um componente cai ou a rede degrada — antes de acontecer.</text>
+
+  <g font-size="14" font-weight="600">
+    <rect x="64" y="322" width="166" height="38" rx="19" fill="#10b981" fill-opacity="0.14" stroke="#10b981" stroke-opacity="0.5"/>
+    <text x="147" y="346" fill="#6ee7b7" text-anchor="middle">o motor calcula</text>
+    <rect x="242" y="322" width="166" height="38" rx="19" fill="#38bdf8" fill-opacity="0.14" stroke="#38bdf8" stroke-opacity="0.5"/>
+    <text x="325" y="346" fill="#7dd3fc" text-anchor="middle">o coletor mede</text>
+    <rect x="420" y="322" width="196" height="38" rx="19" fill="#a78bfa" fill-opacity="0.14" stroke="#a78bfa" stroke-opacity="0.5"/>
+    <text x="518" y="346" fill="#c4b5fd" text-anchor="middle">a IA só interpreta</text>
+  </g>
+
+  <!-- mini topologia -->
+  <g transform="translate(720,58)">
+    <!-- zonas -->
+    <rect x="0" y="0" width="190" height="120" rx="12" fill="#e0b25c" fill-opacity="0.07" stroke="#e0b25c" stroke-opacity="0.45" stroke-dasharray="4 4"/>
+    <text x="14" y="22" fill="#e0b25c" font-size="11" font-weight="700" letter-spacing="2">DATACENTER</text>
+    <rect x="236" y="0" width="190" height="120" rx="12" fill="#38bdf8" fill-opacity="0.07" stroke="#38bdf8" stroke-opacity="0.45" stroke-dasharray="4 4"/>
+    <text x="250" y="22" fill="#38bdf8" font-size="11" font-weight="700" letter-spacing="2">REDE DO CLIENTE</text>
+    <rect x="0" y="196" width="426" height="110" rx="12" fill="#a78bfa" fill-opacity="0.07" stroke="#a78bfa" stroke-opacity="0.45" stroke-dasharray="4 4"/>
+    <text x="14" y="218" fill="#a78bfa" font-size="11" font-weight="700" letter-spacing="2">CITRIX CLOUD</text>
+
+    <!-- arestas -->
+    <g fill="none" stroke-width="2.5">
+      <path d="M60 86 C 60 160, 60 200, 60 250" stroke="#10b981"/>
+      <path d="M60 86 C 120 170, 250 190, 330 250" stroke="#10b981"/>
+      <path d="M318 86 C 318 170, 330 200, 340 250" stroke="#10b981"/>
+      <path d="M150 86 C 160 170, 200 200, 200 250" stroke="#10b981" stroke-opacity="0.8"/>
+      <path d="M372 86 C 390 170, 380 200, 372 250" stroke="#f59e0b" stroke-dasharray="7 5"/>
+      <path d="M96 86 C 160 160, 300 200, 360 250" stroke="#ef4444" stroke-dasharray="3 5" stroke-opacity="0.85"/>
+    </g>
+    <circle cx="232" cy="171" r="9" fill="#ef4444" filter="url(#soft)" opacity="0.6"/>
+    <path d="M226 165 l12 12 M238 165 l-12 12" stroke="#fca5a5" stroke-width="2.5" stroke-linecap="round"/>
+
+    <!-- nós -->
+    <g font-size="13" font-weight="600" text-anchor="middle">
+      <rect x="18" y="52" width="84" height="34" rx="8" fill="#0b1220" stroke="#e0b25c"/>
+      <text x="60" y="74" fill="#f5f3ff">VDA</text>
+      <rect x="110" y="52" width="72" height="34" rx="8" fill="#0b1220" stroke="#e0b25c"/>
+      <text x="146" y="74" fill="#f5f3ff">CC</text>
+      <rect x="252" y="52" width="160" height="34" rx="8" fill="#0b1220" stroke="#38bdf8"/>
+      <text x="332" y="74" fill="#f5f3ff">Workspace App</text>
+      <rect x="16" y="250" width="88" height="34" rx="8" fill="#0b1220" stroke="#a78bfa"/>
+      <text x="60" y="272" fill="#f5f3ff">Cloud</text>
+      <rect x="150" y="250" width="100" height="34" rx="8" fill="#0b1220" stroke="#a78bfa"/>
+      <text x="200" y="272" fill="#f5f3ff">DaaS</text>
+      <rect x="290" y="250" width="124" height="34" rx="8" fill="#0b1220" stroke="#a78bfa"/>
+      <text x="352" y="272" fill="#f5f3ff">Gateway</text>
+    </g>
+
+    <!-- legenda -->
+    <g font-size="11" fill="#a3a9c2">
+      <line x1="0" y1="336" x2="22" y2="336" stroke="#10b981" stroke-width="2.5"/><text x="28" y="340">em uso</text>
+      <line x1="96" y1="336" x2="118" y2="336" stroke="#f59e0b" stroke-width="2.5" stroke-dasharray="7 5"/><text x="124" y="340">degradado</text>
+      <line x1="210" y1="336" x2="232" y2="336" stroke="#ef4444" stroke-width="2.5" stroke-dasharray="3 5"/><text x="238" y="340">bloqueado</text>
+    </g>
+  </g>
+</svg>
